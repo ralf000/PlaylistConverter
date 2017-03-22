@@ -1,7 +1,7 @@
 <div class="sidebar content-box" style="display: block;">
     <ul class="nav">
         <!-- Main menu -->
-        <li class="current"><a href="{{url('admin')}}"><i class="glyphicon glyphicon-home"></i> Главная</a></li>
+        <li><a href="{{url('admin')}}"><i class="glyphicon glyphicon-home"></i> Главная</a></li>
         <li><a href="{{url('admin/config')}}"><i class="glyphicon glyphicon-pencil"></i> Настройки</a></li>
         <li><a href="{{url('admin/groups')}}"><i class="glyphicon glyphicon-tasks"></i> Группы каналов</a></li>
         <li><a href="{{url('admin/changed-groups')}}"><i class="glyphicon glyphicon-tasks"></i> Измененные группы</a></li>
