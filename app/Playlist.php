@@ -5,6 +5,8 @@ namespace App;
 
 use App\Contracts\AFile;
 use App\Contracts\ICreating;
+use App\Helpers\ArrayHelper;
+use App\Helpers\MbString;
 
 class Playlist extends AFile implements ICreating
 {

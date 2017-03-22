@@ -4,6 +4,8 @@ namespace App;
 
 use App\Contracts\AFile;
 use App\Contracts\ICreating;
+use App\Helpers\MbString;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 
 class TVProgram extends AFile implements ICreating
