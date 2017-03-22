@@ -28,9 +28,9 @@ class TVProgram extends AFile implements ICreating
      */
     public function __construct()
     {
-        $this->path = App::get('config')->get('main.inputTVProgram');
+        $this->path = config('main.inputTVProgram');
         parent::__construct($this->path);
-        $this->outputTVName = App::get('config')->get('main.outputTVProgramName');
+        $this->outputTVName = config('main.outputTVProgramName');
         $this->outputTVPath = __DIR__ . '/../../' . $this->outputTVName;
         $this->outputTVGzPath = $this->outputTVPath . '.gz';
     }
@@ -127,7 +127,7 @@ class TVProgram extends AFile implements ICreating
      */
     private function getReserveTvProgramPath() : string
     {
-        return $this->path = App::get('config')->get('main.inputReserveTVProgram');
+        return $this->path = config('main.inputReserveTVProgram');
     }
 
     /**

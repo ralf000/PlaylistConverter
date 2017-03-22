@@ -21,7 +21,7 @@ class Playlist extends AFile implements ICreating
     /**
      * @var Config
      */
-    private $config;
+//    private $config;
     /**
      * @var int Общее количество каналов
      */
@@ -31,9 +31,9 @@ class Playlist extends AFile implements ICreating
      */
     public function __construct()
     {
-        $path = App::get('config')->get('main.inputPlaylist');
+        $path = config('main.inputPlaylist');
         parent::__construct($path);
-        $this->config = App::get('config');
+//        $this->config = App::get('config');
     }
     /**
      * Создает новый плейлист
@@ -72,7 +72,7 @@ class Playlist extends AFile implements ICreating
      */
     private function writeDataToPlaylist()
     {
-        $playlistName = $this->config->get('main.outputPlaylistName');
+        $playlistName = config('main.outputPlaylistName');
         $playlistPath = __DIR__ . '/../../' . $playlistName;
         $descriptor = fopen($playlistPath, 'w');
         fwrite($descriptor, '#EXTM3U' . PHP_EOL);
@@ -91,10 +91,14 @@ class Playlist extends AFile implements ICreating
     private function changeChannelAttribute()
     {
         $title = $this->channel->getTitle();
-        $renameChannels = $this->config->get('renameChannels');
+//        $renameChannels = $this->config->get('renameChannels');
+        $renameChannels = RenamedChannel::all()->toArray();
+        dd($renameChannels);
         if (array_key_exists($title, $renameChannels))
             $this->channel->setTitle($renameChannels[$title]);
-        $changeGroups = ArrayHelper::arrayValuesChangeCase($this->config->get('changeGroups'));
+//        $changeGroups = ArrayHelper::arrayValuesChangeCase($this->config->get('changeGroups'));
+        dd(ChangedGroupChannel::all()->toArray());
+        $changeGroups = ArrayHelper::arrayValuesChangeCase(ChangedGroupChannel::all()->toArray());
         if (array_key_exists($title, $changeGroups))
             $this->channel->setGroup($changeGroups[$title]);
     }
@@ -104,10 +108,14 @@ class Playlist extends AFile implements ICreating
      */
     private function filterChannel() : bool
     {
-        $excludeChannels = $this->config->get('excludeChannels');
+//        $excludeChannels = $this->config->get('excludeChannels');
+        $excludeChannels = ExcludedChannel::all()->toArray();
+        dd($excludeChannels);
         if (in_array($this->channel->getTitle(), $excludeChannels))
             return false;
-        $excludeGroups = ArrayHelper::arrayValuesChangeCase($this->config->get('excludeGroups'));
+//        $excludeGroups = ArrayHelper::arrayValuesChangeCase($this->config->get('excludeGroups'));
+        dd(ExcludedGroup::all()->toArray());
+        $excludeGroups = ArrayHelper::arrayValuesChangeCase(ExcludedGroup::all()->toArray());
         if (in_array($this->channel->getGroup(), $excludeGroups))
             return false;
         return true;
@@ -117,7 +125,8 @@ class Playlist extends AFile implements ICreating
      */
     private function addAdditionalChannels()
     {
-        $additionalChannels = $this->config->get('additionalChannels');
+//        $additionalChannels = $this->config->get('additionalChannels');
+        $additionalChannels = AdditionalChannel::all()->toArray();
         foreach ($additionalChannels as $additionalChannel) {
             if (!isset($additionalChannel['group']) || empty($additionalChannel['group']))
                 $additionalChannel['group'] = 'другое';
@@ -145,7 +154,9 @@ class Playlist extends AFile implements ICreating
     private function sortGroups()
     {
         $output = [];
-        foreach ($this->config->get('groupOrder') as $group) {
+//        foreach ($this->config->get('groupOrder') as $group) {
+        dd(SortedGroup::all()->toArray());
+        foreach (SortedGroup::all()->toArray() as $group) {
             foreach ($this->channels as $channel) {
                 /**
                  * @var Channel $channel
