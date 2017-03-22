@@ -13,4 +13,23 @@
 
 Route::get('/', function () {
     return view('welcome');
+})->middleware('auth.basic');
+
+Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
+
+    //admin
+    Route::get('/', function () {
+        if (view()->exists('admin.index')) {
+            $data = ['title' => 'Панеля администратора'];
+            return view('admin.index', $data);
+        }
+        return view('errors.404');
+
+    });/*->middleware('auth.basic');*/
+
 });
+
+Auth::routes();
+
+//Route::get('/home', 'HomeController@index');
+
