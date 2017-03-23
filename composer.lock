@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "14c7c3cbdf305cc7255f03b490a0010f",
-    "content-hash": "1c99419cba06056529225f03b1797961",
+    "hash": "68e785ee6f0fb48beb3c7b1cbca15bf7",
+    "content-hash": "c36dd65cacbbc1fbdee19d59498a44bd",
     "packages": [
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -263,6 +263,59 @@
                 "parser"
             ],
             "time": "2016-11-02 15:56:58"
+        },
+        {
+            "name": "infinety-es/config",
+            "version": "1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Krato/laravel-config-writer.git",
+                "reference": "5baa982bcdfc690d78e26742bd346c1946a6aadb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Krato/laravel-config-writer/zipball/5baa982bcdfc690d78e26742bd346c1946a6aadb",
+                "reference": "5baa982bcdfc690d78e26742bd346c1946a6aadb",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "~5.0.",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Infinety\\Config\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexey Bobkov",
+                    "email": "aleksey.bobkov@gmail.com"
+                },
+                {
+                    "name": "Samuel Georges",
+                    "email": "daftspunky@gmail.com"
+                },
+                {
+                    "name": "Eric Lagarda",
+                    "email": "eric@infinety.es"
+                }
+            ],
+            "description": "Edit and write config files for laravel 5.1 and up",
+            "homepage": "http://infinety.es",
+            "keywords": [
+                "config",
+                "edit",
+                "infinety",
+                "laravel",
+                "write"
+            ],
+            "time": "2017-03-13 08:06:22"
         },
         {
             "name": "jakub-onderka/php-console-color",
