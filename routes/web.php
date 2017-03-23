@@ -40,5 +40,26 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         'as' => 'config-update'
     ]);
 
+    // admin/groups
+    Route::get('/groups', [
+        'uses' => 'ChannelGroupController@index',
+        'as' => 'groups'
+    ]);
+
+    Route::put('/groups', [
+        'uses' => 'ChannelGroupController@store',
+        'as' => 'groups-store'
+    ]);
+
+    Route::post('/groups', [
+        'uses' => 'ChannelGroupController@update',
+        'as' => 'groups-update'
+    ]);
+
+    Route::delete('/groups', [
+        'uses' => 'ChannelGroupController@destroy',
+        'as' => 'groups-delete'
+    ]);
+
 });
 

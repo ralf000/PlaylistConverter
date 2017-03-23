@@ -26,4 +26,15 @@ $(document).ready(function () {
     if (item && item.length === 1) {
         item.parent('li').addClass('current');
     }
+
+    /**
+     * Обработтчик для удаления элементов
+     */
+    $('button.element-delete-btn').on('click', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var form = $('form#element-delete');
+        form.find('input[name=id]').attr('value', id);
+        form.submit();
+    })
 });
