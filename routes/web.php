@@ -15,9 +15,11 @@ Route::get('/', function () {
     return view('welcome');
 })->middleware('auth.basic');
 
+Auth::routes();
+
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
-    //admin
+    // admin
     Route::get('/', function () {
         if (view()->exists('admin.index')) {
             $data = ['title' => 'Панеля администратора'];
@@ -25,11 +27,18 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         }
         return view('errors.404');
 
-    });/*->middleware('auth.basic');*/
+    });
+
+    // admin/config
+    Route::get('/config', [
+        'uses' => 'ConfigController@index',
+        'as' => 'config'
+    ]);
+
+    Route::post('/config', [
+        'uses' => 'ConfigController@update',
+        'as' => 'config-update'
+    ]);
 
 });
-
-Auth::routes();
-
-//Route::get('/home', 'HomeController@index');
 
