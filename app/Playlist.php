@@ -14,10 +14,12 @@ class Playlist extends AFile implements ICreating
      * @var Channel
      */
     private $channel;
+
     /**
-     * @var array массив каналов типа Channel
+     * @var array массив обработанных каналов типа Channel
      */
     private $channels = [];
+
     /**
      * @var Config
      */
@@ -26,19 +28,43 @@ class Playlist extends AFile implements ICreating
      * @var int Общее количество каналов
      */
     private $channelCounter = 0;
+
     /**
      * Playlist constructor.
      */
     public function __construct()
     {
-        $path = config('main.inputPlaylist');
+        $path = config('main.inputPlaylist.value');
         parent::__construct($path);
+        $this->setChannelsFromPlaylist();
 //        $this->config = App::get('config');
     }
+
     /**
      * Создает новый плейлист
      */
     public function create()
+    {
+        $this->handleChannels();
+        $this->writeDataToPlaylist();
+    }
+
+    public function getGroupsFromPlaylist()
+    {
+        $groups = [];
+        /**
+         * @var Channel $channel
+         */
+        foreach ($this->channels as $channel) {
+            $groups[] = $channel->getGroup();
+        }
+        return array_values(array_unique($groups));
+    }
+
+    /**
+     * Парсит телеканалы из плейлиста
+     */
+    private function setChannelsFromPlaylist()
     {
         while (!feof($this->descriptor)) {
             $line = MbString::mb_trim(fgets($this->descriptor));
@@ -54,19 +80,27 @@ class Playlist extends AFile implements ICreating
                 list(, $channelData['group']) = explode(':', $line);
             } else if (mb_substr($line, 0, 4) == 'http') {
                 $channelData['url'] = $line;
-                $this->channel = new Channel($channelData);
-                $this->changeChannelAttribute();
-                if ($this->filterChannel()) {
-                    $this->channels[] = $this->channel;
-                }
+                $this->channels[] = new Channel($channelData);
             }
         }
         $this->close($this->descriptor);
+    }
+
+    private function handleChannels()
+    {
+        $this->channels = [];
+        foreach ($this->channels as $channel) {
+            $this->channel = $channel;
+            $this->changeChannelAttribute();
+            if ($this->filterChannel()) {
+                $this->channels[] = $this->channel;
+            }
+        }
         $this->addAdditionalChannels();
         $this->sortChannels();
         $this->sortGroups();
-        $this->writeDataToPlaylist();
     }
+
     /**
      * Записывает сформированные каналы в файл плейлиста
      */
@@ -85,6 +119,7 @@ class Playlist extends AFile implements ICreating
         $this->close($descriptor);
         App::get('logger')->successCreatePlaylistLog($this->channelCounter, count($this->channels));
     }
+
     /**
      * Переименовывает каналы и меняет их группы
      */
@@ -93,15 +128,14 @@ class Playlist extends AFile implements ICreating
         $title = $this->channel->getTitle();
 //        $renameChannels = $this->config->get('renameChannels');
         $renameChannels = RenamedChannel::all()->toArray();
-        dd($renameChannels);
         if (array_key_exists($title, $renameChannels))
             $this->channel->setTitle($renameChannels[$title]);
 //        $changeGroups = ArrayHelper::arrayValuesChangeCase($this->config->get('changeGroups'));
-        dd(ChangedGroupChannel::all()->toArray());
         $changeGroups = ArrayHelper::arrayValuesChangeCase(ChangedGroupChannel::all()->toArray());
         if (array_key_exists($title, $changeGroups))
             $this->channel->setGroup($changeGroups[$title]);
     }
+
     /**
      * Фильтрует каналы
      * @return bool
@@ -110,16 +144,15 @@ class Playlist extends AFile implements ICreating
     {
 //        $excludeChannels = $this->config->get('excludeChannels');
         $excludeChannels = ExcludedChannel::all()->toArray();
-        dd($excludeChannels);
         if (in_array($this->channel->getTitle(), $excludeChannels))
             return false;
 //        $excludeGroups = ArrayHelper::arrayValuesChangeCase($this->config->get('excludeGroups'));
-        dd(ExcludedGroup::all()->toArray());
         $excludeGroups = ArrayHelper::arrayValuesChangeCase(ExcludedGroup::all()->toArray());
         if (in_array($this->channel->getGroup(), $excludeGroups))
             return false;
         return true;
     }
+
     /**
      * Добавляет дополнительные каналы
      */
@@ -133,6 +166,7 @@ class Playlist extends AFile implements ICreating
             $this->channels[] = new Channel($additionalChannel);
         }
     }
+
     /**
      * Сортирует каналы
      * @param $direction
@@ -151,6 +185,7 @@ class Playlist extends AFile implements ICreating
                 return $b->getTitle() <=> $a->getTitle();
         });
     }
+
     private function sortGroups()
     {
         $output = [];
@@ -167,6 +202,7 @@ class Playlist extends AFile implements ICreating
         }
         $this->channels = $output;
     }
+
     /**
      * @return array
      */
@@ -174,4 +210,5 @@ class Playlist extends AFile implements ICreating
     {
         return $this->channels;
     }
+
 }

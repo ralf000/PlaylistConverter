@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ChannelGroup;
+use App\Playlist;
 use Illuminate\Http\Request;
 
 class ChannelGroupController extends Controller
@@ -96,5 +97,26 @@ class ChannelGroupController extends Controller
         if (ChannelGroup::destroy((int)$request->id))
             return redirect()->route('groups')->with('status', 'Группа успешно удалена');
         throw new \Exception("Не удалось удалить группу с идентификатором {$request->id}");
+    }
+
+    public function updateGroupsFromPlaylist()
+    {
+        $playlist = new Playlist();
+        $groupsFromPlaylist = $playlist->getGroupsFromPlaylist();
+        $addedGroups = ChannelGroup::all(['name'])->toArray();
+        $preparedAddedGroups = [];
+        foreach ($addedGroups as $addedGroup) {
+            $preparedAddedGroups[] = mb_strtolower($addedGroup['name']);
+        }
+        foreach ($groupsFromPlaylist as $groupFromPlaylist) {
+            if (in_array(mb_strtolower($groupFromPlaylist), $preparedAddedGroups)) continue;
+
+            $channelGroup = new ChannelGroup();
+            $channelGroup->fill([
+                'name' => $groupFromPlaylist
+            ]);
+            $channelGroup->save();
+        }
+        return (new ChannelGroup())->all()->toArray();
     }
 }

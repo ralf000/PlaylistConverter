@@ -1,3 +1,24 @@
+function addHandlers() {
+   addDeleteElementsHandler();
+}
+
+/**
+ * Обработтчик для удаления элементов
+ */
+function addDeleteElementsHandler() {
+    var btn = $('button.element-delete-btn');
+    btn.unbind();
+    btn.on('click', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var name = $(this).data('element-name');
+        var form = $('form#element-delete');
+        form.find('input[name=id]').attr('value', id);
+        if (confirm('Вы действительно хотите удалить элемент ' + '"'+ name +'"?'))
+            form.submit();
+    });
+}
+
 $(document).ready(function () {
 
     $(".submenu > a").click(function (e) {
@@ -27,16 +48,5 @@ $(document).ready(function () {
         item.parent('li').addClass('current');
     }
 
-    /**
-     * Обработтчик для удаления элементов
-     */
-    $('button.element-delete-btn').on('click', function (e) {
-        e.preventDefault();
-        var id = $(this).data('id');
-        var name = $(this).data('element-name');
-        var form = $('form#element-delete');
-        form.find('input[name=id]').attr('value', id);
-        if (confirm('Вы действительно хотите удалить элемент ' + '"'+ name +'"?'))
-            form.submit();
-    })
+    addHandlers();
 });
