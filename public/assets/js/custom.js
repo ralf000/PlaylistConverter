@@ -33,8 +33,10 @@ $(document).ready(function () {
     $('button.element-delete-btn').on('click', function (e) {
         e.preventDefault();
         var id = $(this).data('id');
+        var name = $(this).data('element-name');
         var form = $('form#element-delete');
         form.find('input[name=id]').attr('value', id);
-        form.submit();
+        if (confirm('Вы действительно хотите удалить элемент ' + '"'+ name +'"?'))
+            form.submit();
     })
 });

@@ -47,6 +47,7 @@
                                    value="{{$group['name']}}">
                             <span class="input-group-btn">
                                 <button data-id="{{$group['id']}}"
+                                        data-element-name="{{$group['name']}}"
                                         class="element-delete-btn btn btn-default"
                                         type="button">
                                 <span class="glyphicon glyphicon-remove"></span>
