@@ -44,17 +44,19 @@
                     {{ csrf_field() }}
                     @foreach ($groups as $group)
                         <input type="hidden" class="id-input" name="{{$group['id']}}[id]" value="{{$group['id']}}">
+                        <input type="hidden" name="{{$group['id']}}[original_name]" value="{{$group['original_name']}}">
 
                         <div class="form-group">
+                            <span style="color: gray;">Оригинальное название: {{$group['original_name']}}</span>
                             <div class="input-group">
-                                <input name="{{$group['id']}}[name]"
+                                <input name="{{$group['id']}}[new_name]"
                                        type="text" class="form-control"
                                        id="{{$group['id']}}"
-                                       placeholder="{{$group['name']}}"
-                                       value="{{$group['name']}}">
+                                       placeholder="{{$group['new_name']}}"
+                                       value="{{$group['new_name']}}">
                             <span class="input-group-btn">
                                 <button data-id="{{$group['id']}}"
-                                        data-element-name="{{$group['name']}}"
+                                        data-element-name="{{$group['new_name']}}"
                                         class="element-delete-btn btn btn-default"
                                         type="button">
                                 <span class="glyphicon glyphicon-remove"></span>

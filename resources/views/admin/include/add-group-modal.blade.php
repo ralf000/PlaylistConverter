@@ -11,7 +11,7 @@
                 {{ method_field('put') }}
                 <div class="modal-body">
                     {{ csrf_field() }}
-                    <input name="name" type="text" class="form-control" id="title"
+                    <input name="original_name" type="text" class="form-control" id="title"
                            placeholder="Введите название группы">
                 </div>
                 <div class="modal-footer">

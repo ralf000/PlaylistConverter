@@ -8,7 +8,7 @@ class ChannelGroup extends Model
 {
     protected $table = 'channel_groups';
 
-    protected $fillable = ['name', 'sort'];
+    protected $fillable = ['original_name', 'new_name', 'sort'];
 
     public $timestamps = false;
 }

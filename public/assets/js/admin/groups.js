@@ -6,18 +6,20 @@ function updateGroupsForm(form, data) {
     var inputs = [];
     var fields = [];
     $.each(data, function (id, el) {
-        hiddenInputs[id] = '<input type="hidden" class="id-input" name="' + el.id + '" value="' + el.name + '">';
+        hiddenInputs[id] = '<input type="hidden" class="id-input" name="' + el.id + '[id]" value="' + el.name + '">';
+        hiddenInputs[id] = '<input type="hidden" name="'+el.id+'[original_name]" value="'+el.original_name+'">';
         inputs[id] =
             '<div class="form-group">\n\
+                <span style="color: gray;">Оригинальное название: '+el.original_name+'</span>\n\
                 <div class="input-group">\n\
-                    <input name="' + el.id + '[name]"\n\
+                    <input name="' + el.id + '[new_name]"\n\
                            type="text" class="form-control"\n\
                            id="' + el.id + '"\n\
-                           placeholder="' + el.name + '"\n\
-                           value="' + el.name + '">\n\
+                           placeholder="' + el.new_name + '"\n\
+                           value="' + el.new_name + '">\n\
                     <span class="input-group-btn">\n\
                     <button data-id="' + el.id + '"\n\
-                        data-element-name="' + el.name + '"\n\
+                        data-element-name="' + el.new_name + '"\n\
                         class="element-delete-btn btn btn-default"\n\
                         type="button">\n\
                         <span class="glyphicon glyphicon-remove"></span>\n\

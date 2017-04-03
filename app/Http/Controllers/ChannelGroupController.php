@@ -34,7 +34,7 @@ class ChannelGroupController extends Controller
         $input = $request->except(['_token', '_method']);
 
         $validator = \Validator::make($input, [
-            'name' => 'required|unique:channel_groups'
+            'original_name' => 'required|unique:channel_groups',
         ]);
 
         if ($validator->fails()) {
@@ -43,6 +43,7 @@ class ChannelGroupController extends Controller
 
         $group = new ChannelGroup();
         $group->fill($input);
+        $group->new_name = $group->original_name;
         if ($group->save()) {
             return redirect()->route('groups')->with('status', 'Новая группа успешно добавлена');
         }
@@ -73,7 +74,7 @@ class ChannelGroupController extends Controller
 
         foreach ($input as $groupData) {
             $validator = \Validator::make($groupData, [
-                'name' => "required|unique:channel_groups,name,{$groupData['id']}"
+                'new_name' => "required|unique:channel_groups,new_name,{$groupData['id']}"
             ]);
             if ($validator->fails()) {
                 return redirect()->route('groups')->withErrors($validator);
@@ -103,17 +104,18 @@ class ChannelGroupController extends Controller
     {
         $playlist = new Playlist();
         $groupsFromPlaylist = $playlist->getGroupsFromPlaylist();
-        $addedGroups = ChannelGroup::all(['name'])->toArray();
+        $addedGroups = ChannelGroup::all(['new_name'])->toArray();
         $preparedAddedGroups = [];
         foreach ($addedGroups as $addedGroup) {
-            $preparedAddedGroups[] = mb_strtolower($addedGroup['name']);
+            $preparedAddedGroups[] = mb_strtolower($addedGroup['new_name']);
         }
         foreach ($groupsFromPlaylist as $groupFromPlaylist) {
             if (in_array(mb_strtolower($groupFromPlaylist), $preparedAddedGroups)) continue;
 
             $channelGroup = new ChannelGroup();
             $channelGroup->fill([
-                'name' => $groupFromPlaylist
+                'original_name' => $groupFromPlaylist,
+                'new_name' => $groupFromPlaylist,
             ]);
             $channelGroup->save();
         }
