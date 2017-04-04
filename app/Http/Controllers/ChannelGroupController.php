@@ -121,4 +121,21 @@ class ChannelGroupController extends Controller
         }
         return (new ChannelGroup())->all()->toArray();
     }
+
+    public function sortGroups(ChannelGroup $group)
+    {
+        $title = 'Сортировка групп';
+        $groups = $group->all()->toArray();
+
+        return view('admin.sort-groups', compact('title', 'groups'));
+    }
+
+    public function changeGroupVisibility(Request $request)
+    {
+        $id = $request->id;
+        if (!$id) throw new \Exception('Не указан id элемента');
+        $group = ChannelGroup::find((int) $id);
+        $group->hidden = ($group->hidden === 0) ? 1 : 0;
+        return $group->save();
+    }
 }

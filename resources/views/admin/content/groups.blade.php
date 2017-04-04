@@ -29,9 +29,15 @@
 
 
     <div class="panel-body">
-        <button type="button" class="btn btn-warning pull-left" data-toggle="modal" data-target="#add-group">
+        <button type="submit" class="btn btn-primary" form="groups-form">
+            Сохранить
+        </button>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-group">
             Добавить группу
         </button>
+        <a href="{{ route('sort-groups') }}" class="btn btn-warning">
+            Сортировать группы
+        </a>
         <button type="button" class="btn btn-default pull-right" id="update-groups" data-token="{{ csrf_token() }}">
             Обновить список групп из текущего плейлиста
         </button>
@@ -49,12 +55,36 @@
                         <div class="form-group">
                             <span style="color: gray;">Оригинальное название: {{$group['original_name']}}</span>
                             <div class="input-group">
+                                @if($group['hidden'] === 0)
                                 <input name="{{$group['id']}}[new_name]"
                                        type="text" class="form-control"
                                        id="{{$group['id']}}"
                                        placeholder="{{$group['new_name']}}"
                                        value="{{$group['new_name']}}">
+                                @else
+                                    <input name="{{$group['id']}}[new_name]"
+                                           type="text" class="form-control"
+                                           id="{{$group['id']}}"
+                                           placeholder="{{$group['new_name']}}"
+                                           style="opacity: 0.4"
+                                           value="{{$group['new_name']}}" disabled>
+                                @endif
                             <span class="input-group-btn">
+                                @if($group['hidden'] === 0)
+                                    <button data-id="{{$group['id']}}"
+                                            data-token="{{ csrf_token() }}"
+                                            class="change-visibility-btn element-hide-btn btn btn-default"
+                                            type="button">
+                                    Скрыть
+                                    </button>
+                                @else
+                                    <button data-id="{{$group['id']}}"
+                                            data-token="{{ csrf_token() }}"
+                                            class="change-visibility-btn element-show-btn btn btn-default"
+                                            type="button">
+                                    Показать
+                                    </button>
+                                @endif
                                 <button data-id="{{$group['id']}}"
                                         data-element-name="{{$group['new_name']}}"
                                         class="element-delete-btn btn btn-default"
@@ -65,18 +95,22 @@
                             </div>
                         </div>
                     @endforeach
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Сохранить</button>
-                    </div>
                 </form>
 
-                {{--Форма для удаления элемента--}}
+                {{--Форма для удаления группы--}}
                 <form action="{{ route('groups-delete') }}" method="post" id="element-delete">
                     {{ csrf_field() }}
                     {{ method_field('delete') }}
                     <input type="hidden" name="id">
                 </form>
-                {{--/Форма для удаления элемента--}}
+                {{--/Форма для удаления группы--}}
+
+                {{--Форма для сокрытия группы--}}
+                <form action="{{ route('change-group-visibility') }}" method="post" id="change-visibility">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="id">
+                </form>
+                {{--/Форма для сокрытия группы--}}
 
             @else
                 <p>Группы пока не добавлены</p>
@@ -85,5 +119,4 @@
     </div>
 </div>
 @include('admin.include.add-group-modal')
-
 <script src="{{ asset('/assets/js/admin/groups.js') }}"></script>

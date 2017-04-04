@@ -61,6 +61,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         'as' => 'groups-delete'
     ]);
 
+    Route::get('/sort-groups', [
+        'uses' => 'ChannelGroupController@sortGroups',
+        'as' => 'sort-groups'
+    ]);
+
     /**
      * Для ajax запросов
      */
@@ -68,6 +73,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
         Route::post('/update-groups-from-playlist', [
             'uses' => 'ChannelGroupController@updateGroupsFromPlaylist'
+        ]);
+
+        Route::post('/change-group-visibility', [
+            'uses' => 'ChannelGroupController@changeGroupVisibility',
+            'as' => 'change-group-visibility'
         ]);
 
     });
