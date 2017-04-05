@@ -17,7 +17,7 @@ class ChannelGroupController extends Controller
     public function index(ChannelGroup $group)
     {
         $title = 'Группы каналов';
-        $groups = $group->all()->toArray();
+        $groups = $group->all()->sortBy('sort')->toArray();
 
         return view('admin.groups', compact('title', 'groups'));
     }
@@ -52,17 +52,6 @@ class ChannelGroupController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\ChannelGroup $channelGroup
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ChannelGroup $channelGroup)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
@@ -73,17 +62,20 @@ class ChannelGroupController extends Controller
         $input = $request->except(['_token']);
 
         foreach ($input as $groupData) {
-            $validator = \Validator::make($groupData, [
-                'new_name' => "required|unique:channel_groups,new_name,{$groupData['id']}"
-            ]);
-            if ($validator->fails()) {
-                return redirect()->route('groups')->withErrors($validator);
+
+            if (!$groupData['disabled']) {
+                $validator = \Validator::make($groupData, [
+                    'new_name' => "required|unique:channel_groups,new_name,{$groupData['id']}"
+                ]);
+                if ($validator->fails()) {
+                    return redirect()->route('groups')->withErrors($validator);
+                }
             }
             $group = ChannelGroup::find($groupData['id']);
             $group->fill($groupData);
             $group->update();
         }
-        return redirect()->route('groups')->with('status', 'Данные групп успешно обновлены');
+        return redirect()->route('groups')->with('status', 'Изменения успешно сохранены');
     }
 
     /**
@@ -118,23 +110,22 @@ class ChannelGroupController extends Controller
                 'new_name' => $groupFromPlaylist,
             ]);
             $channelGroup->save();
+
         }
-        return (new ChannelGroup())->all()->toArray();
+
+        return redirect()->route('groups')->with('status', 'Список групп успешно обновлен из плейлиста');
     }
 
-    public function sortGroups(ChannelGroup $group)
-    {
-        $title = 'Сортировка групп';
-        $groups = $group->all()->toArray();
-
-        return view('admin.sort-groups', compact('title', 'groups'));
-    }
-
+    /**
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
     public function changeGroupVisibility(Request $request)
     {
         $id = $request->id;
         if (!$id) throw new \Exception('Не указан id элемента');
-        $group = ChannelGroup::find((int) $id);
+        $group = ChannelGroup::find((int)$id);
         $group->hidden = ($group->hidden === 0) ? 1 : 0;
         return $group->save();
     }

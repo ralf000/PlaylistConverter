@@ -35,10 +35,7 @@
         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-group">
             Добавить группу
         </button>
-        <a href="{{ route('sort-groups') }}" class="btn btn-warning">
-            Сортировать группы
-        </a>
-        <button type="button" class="btn btn-default pull-right" id="update-groups" data-token="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-default pull-right" id="update-groups" form="update-groups-form">
             Обновить список групп из текущего плейлиста
         </button>
     </div>
@@ -48,53 +45,11 @@
                 <form class="form-horizontal" role="form" action="{{ route('groups-update') }}" method="post"
                       id="groups-form">
                     {{ csrf_field() }}
-                    @foreach ($groups as $group)
-                        <input type="hidden" class="id-input" name="{{$group['id']}}[id]" value="{{$group['id']}}">
-                        <input type="hidden" name="{{$group['id']}}[original_name]" value="{{$group['original_name']}}">
-
-                        <div class="form-group">
-                            <span style="color: gray;">Оригинальное название: {{$group['original_name']}}</span>
-                            <div class="input-group">
-                                @if($group['hidden'] === 0)
-                                <input name="{{$group['id']}}[new_name]"
-                                       type="text" class="form-control"
-                                       id="{{$group['id']}}"
-                                       placeholder="{{$group['new_name']}}"
-                                       value="{{$group['new_name']}}">
-                                @else
-                                    <input name="{{$group['id']}}[new_name]"
-                                           type="text" class="form-control"
-                                           id="{{$group['id']}}"
-                                           placeholder="{{$group['new_name']}}"
-                                           style="opacity: 0.4"
-                                           value="{{$group['new_name']}}" disabled>
-                                @endif
-                            <span class="input-group-btn">
-                                @if($group['hidden'] === 0)
-                                    <button data-id="{{$group['id']}}"
-                                            data-token="{{ csrf_token() }}"
-                                            class="change-visibility-btn element-hide-btn btn btn-default"
-                                            type="button">
-                                    Скрыть
-                                    </button>
-                                @else
-                                    <button data-id="{{$group['id']}}"
-                                            data-token="{{ csrf_token() }}"
-                                            class="change-visibility-btn element-show-btn btn btn-default"
-                                            type="button">
-                                    Показать
-                                    </button>
-                                @endif
-                                <button data-id="{{$group['id']}}"
-                                        data-element-name="{{$group['new_name']}}"
-                                        class="element-delete-btn btn btn-default"
-                                        type="button">
-                                <span class="glyphicon glyphicon-remove"></span>
-                                </button>
-                            </span>
-                            </div>
-                        </div>
-                    @endforeach
+                    <div id="sortable" class="groups-list">
+                        @foreach ($groups as $group)
+                            @include('admin.include.group')
+                        @endforeach
+                    </div>
                 </form>
 
                 {{--Форма для удаления группы--}}
@@ -111,6 +66,12 @@
                     <input type="hidden" name="id">
                 </form>
                 {{--/Форма для сокрытия группы--}}
+
+                {{--Форма для обновления списка групп из плейлиста--}}
+                <form action="{{ route('update-groups-from-playlist') }}" method="post" id="update-groups-form">
+                    {{ csrf_field() }}
+                </form>
+                {{-- /Форма для обновления списка групп из плейлиста--}}
 
             @else
                 <p>Группы пока не добавлены</p>
