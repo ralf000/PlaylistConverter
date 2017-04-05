@@ -31,6 +31,9 @@ class ChannelGroupController extends Controller
      */
     public function store(Request $request)
     {
+        //масимальное значение поля sort для сортировки новых добавляемых групп
+        $maxSortValue = ChannelGroup::all('sort')->max('sort');
+
         $input = $request->except(['_token', '_method']);
 
         $validator = \Validator::make($input, [
@@ -44,6 +47,7 @@ class ChannelGroupController extends Controller
         $group = new ChannelGroup();
         $group->fill($input);
         $group->new_name = $group->original_name;
+        $group->sort = ++$maxSortValue;
         if ($group->save()) {
             return redirect()->route('groups')->with('status', 'Новая группа успешно добавлена');
         }
@@ -92,8 +96,16 @@ class ChannelGroupController extends Controller
         throw new \Exception("Не удалось удалить группу с идентификатором {$request->id}");
     }
 
+    /**
+     * Получает все группы из плейлиста и сохраняет те, которые отсутствуют в бд
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function updateGroupsFromPlaylist()
     {
+        //масимальное значение поля sort для сортировки новых добавляемых групп
+        $maxSortValue = ChannelGroup::all('sort')->max('sort');
+
         $playlist = new Playlist();
         $groupsFromPlaylist = $playlist->getGroupsFromPlaylist();
         $addedGroups = ChannelGroup::all(['new_name'])->toArray();
@@ -108,9 +120,9 @@ class ChannelGroupController extends Controller
             $channelGroup->fill([
                 'original_name' => $groupFromPlaylist,
                 'new_name' => $groupFromPlaylist,
+                'sort' => ++$maxSortValue
             ]);
             $channelGroup->save();
-
         }
 
         return redirect()->route('groups')->with('status', 'Список групп успешно обновлен из плейлиста');
