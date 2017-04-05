@@ -35,9 +35,6 @@
         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-group">
             Добавить группу
         </button>
-        <button type="submit" class="btn btn-default pull-right" id="update-groups" form="update-groups-form">
-            Обновить список групп из текущего плейлиста
-        </button>
     </div>
     <div class="panel-body">
         <div class="col-md-12">
@@ -66,12 +63,6 @@
                     <input type="hidden" name="id">
                 </form>
                 {{--/Форма для сокрытия группы--}}
-
-                {{--Форма для обновления списка групп из плейлиста--}}
-                <form action="{{ route('update-groups-from-playlist') }}" method="post" id="update-groups-form">
-                    {{ csrf_field() }}
-                </form>
-                {{-- /Форма для обновления списка групп из плейлиста--}}
 
             @else
                 <p>Группы пока не добавлены</p>

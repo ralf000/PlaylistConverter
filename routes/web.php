@@ -61,11 +61,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         'as' => 'groups-delete'
     ]);
 
-    Route::post('/groups/update-groups-from-playlist', [
-        'uses' => 'ChannelGroupController@updateGroupsFromPlaylist',
-        'as' => 'update-groups-from-playlist'
-    ]);
-
     /**
      * Для ajax запросов
      */
