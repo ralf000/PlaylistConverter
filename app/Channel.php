@@ -3,9 +3,26 @@
 namespace App;
 
 use App\Helpers\MbString;
+use Illuminate\Database\Eloquent\Model;
 
-class Channel 
+class Channel extends Model
 {
+    protected $table = 'channels';
+
+    protected $fillable = [];
+
+    public $timestamps = false;
+
+    /**
+     * Связь с ChannelGroup
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function filter()
+    {
+        return $this->belongsTo(ChannelGroup::class);
+    }
+
     /**
      * @var array [title => 'title', group => 'group', url => 'url']
      */
@@ -20,7 +37,7 @@ class Channel
      * @param array $channel
      * [title => 'title', group => 'group', url => 'url']
      */
-    public function __construct(array $channel)
+    public function __construct(array $channel = [])
     {
         $this->channel = $channel;
     }

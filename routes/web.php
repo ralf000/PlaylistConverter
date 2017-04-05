@@ -29,37 +29,77 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
     });
 
-    // admin/config
-    Route::get('/config', [
-        'uses' => 'ConfigController@index',
-        'as' => 'config'
-    ]);
+    /**
+     * admin/config
+     */
+    Route::group(['prefix' => 'config'], function () {
 
-    Route::post('/config', [
-        'uses' => 'ConfigController@update',
-        'as' => 'config-update'
-    ]);
+        Route::get('/', [
+            'uses' => 'ConfigController@index',
+            'as' => 'config'
+        ]);
 
-    // admin/groups
-    Route::get('/groups', [
-        'uses' => 'ChannelGroupController@index',
-        'as' => 'groups'
-    ]);
+        Route::post('/', [
+            'uses' => 'ConfigController@update',
+            'as' => 'config-update'
+        ]);
 
-    Route::put('/groups', [
-        'uses' => 'ChannelGroupController@store',
-        'as' => 'groups-store'
-    ]);
+    });
 
-    Route::post('/groups', [
-        'uses' => 'ChannelGroupController@update',
-        'as' => 'groups-update'
-    ]);
+    /**
+     * admin/groups
+     */
+    Route::group(['prefix' => 'groups'], function () {
 
-    Route::delete('/groups', [
-        'uses' => 'ChannelGroupController@destroy',
-        'as' => 'groups-delete'
-    ]);
+        Route::get('/', [
+            'uses' => 'ChannelGroupController@index',
+            'as' => 'groups'
+        ]);
+
+        Route::put('/', [
+            'uses' => 'ChannelGroupController@store',
+            'as' => 'groups-store'
+        ]);
+
+        Route::post('/', [
+            'uses' => 'ChannelGroupController@update',
+            'as' => 'groups-update'
+        ]);
+
+        Route::delete('/', [
+            'uses' => 'ChannelGroupController@destroy',
+            'as' => 'groups-delete'
+        ]);
+
+    });
+
+    /**
+     *
+     */
+    Route::group(['prefix' => 'channels'], function () {
+
+        Route::get('/', [
+            'uses' => 'ChannelsController@index',
+            'as' => 'channels'
+        ]);
+
+        Route::put('/', [
+            'uses' => 'ChannelsController@store',
+            'as' => 'channels-store'
+        ]);
+
+        Route::post('/', [
+            'uses' => 'ChannelsController@update',
+            'as' => 'channels-update'
+        ]);
+
+        Route::delete('/', [
+            'uses' => 'ChannelsController@destroy',
+            'as' => 'channels-delete'
+        ]);
+
+    });
+
 
     /**
      * Для ajax запросов
