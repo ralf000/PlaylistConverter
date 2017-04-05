@@ -16,8 +16,11 @@ class ChannelGroupController extends Controller
      */
     public function index(ChannelGroup $group)
     {
+
         $title = 'Группы каналов';
         $groups = $group->all()->sortBy('sort')->toArray();
+        //если нет добавленных групп то обновить список из плейлиста
+        if (!$groups) return $this->updateGroupsFromPlaylist();
 
         return view('admin.groups', compact('title', 'groups'));
     }
