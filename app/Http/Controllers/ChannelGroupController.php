@@ -51,6 +51,7 @@ class ChannelGroupController extends Controller
         $group->fill($input);
         $group->new_name = $group->original_name;
         $group->sort = ++$maxSortValue;
+        $group->own = 1;
         if ($group->save()) {
             return redirect()->route('groups')->with('status', 'Новая группа успешно добавлена');
         }
@@ -94,8 +95,12 @@ class ChannelGroupController extends Controller
      */
     public function destroy(Request $request)
     {
-        if (ChannelGroup::destroy((int)$request->id))
+        $group = ChannelGroup::find((int)$request->id);
+        //если группа добавлена пользователем (own === 1) и передан верный id
+        if ($group && $group->own){
+            ChannelGroup::destroy($group->id);
             return redirect()->route('groups')->with('status', 'Группа успешно удалена');
+        }
         throw new \Exception("Не удалось удалить группу с идентификатором {$request->id}");
     }
 

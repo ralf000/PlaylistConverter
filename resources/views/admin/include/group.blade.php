@@ -7,10 +7,10 @@
            value="{{$group['sort']}}">
     <input type="hidden" name="{{$group['id']}}[disabled]" class="disable-tag"
            value="{{ $group['hidden'] }}">
-{{--    @if($group['hidden'])
-        <input type="hidden" name="{{$group['id']}}[new_name]"
-               value="{{$group['new_name']}}">
-    @endif--}}
+    {{--    @if($group['hidden'])
+            <input type="hidden" name="{{$group['id']}}[new_name]"
+                   value="{{$group['new_name']}}">
+        @endif--}}
 
     <div class="form-group">
         <span style="color: gray;">Оригинальное название: {{$group['original_name']}}</span>
@@ -44,10 +44,12 @@
                             class="change-visibility-btn element-show-btn btn btn-default"
                             type="button">Показать</button>
                 @endif
-                <button data-id="{{$group['id']}}"
-                        data-element-name="{{$group['new_name']}}"
-                        class="element-delete-btn btn btn-default"
-                        type="button"><span class="glyphicon glyphicon-remove"></span></button>
+                @if ($group['own'])
+                    <button data-id="{{$group['id']}}"
+                            data-element-name="{{$group['new_name']}}"
+                            class="element-delete-btn btn btn-default"
+                            type="button"><span class="glyphicon glyphicon-remove"></span></button>
+                @endif
             </span>
         </div>
     </div>
