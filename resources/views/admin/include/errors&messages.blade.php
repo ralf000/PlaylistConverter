@@ -16,7 +16,25 @@
 @if (session('status'))
     <div class="panel-body">
         <div class="alert alert-success">
-            {{ session('status') }}
+            @if (session('status') && is_array(session('status')))
+                <ul>
+                    @foreach(session('status') as $status)
+                        <li>{{ $status }}</li>
+                    @endforeach
+                </ul>
+            @else
+                {{ session('status') }}
+            @endif
+        </div>
+    </div>
+@endif
+{{--/Сообщения--}}
+
+{{--Сообщения--}}
+@if (session('info'))
+    <div class="panel-body">
+        <div class="alert alert-info">
+            {{ session('info') }}
         </div>
     </div>
 @endif

@@ -11,17 +11,12 @@ class ChannelGroupController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param ChannelGroup $group
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index(ChannelGroup $group)
+    public function index()
     {
-
+        $groups = ChannelGroup::all()->sortBy('sort')->toArray();
         $title = 'Группы каналов';
-        $groups = $group->all()->sortBy('sort')->toArray();
-        //если нет добавленных групп то обновить список из плейлиста
-        if (!$groups) return $this->updateGroupsFromPlaylist();
-
         return view('admin.groups', compact('title', 'groups'));
     }
 
@@ -97,7 +92,7 @@ class ChannelGroupController extends Controller
     {
         $group = ChannelGroup::find((int)$request->id);
         //если группа добавлена пользователем (own === 1) и передан верный id
-        if ($group && $group->own){
+        if ($group && $group->own) {
             ChannelGroup::destroy($group->id);
             return redirect()->route('groups')->with('status', 'Группа успешно удалена');
         }
@@ -105,11 +100,25 @@ class ChannelGroupController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function changeGroupVisibility(Request $request)
+    {
+        $id = $request->id;
+        if (!$id) throw new \Exception('Не указан id элемента');
+        $group = ChannelGroup::find((int)$id);
+        $group->hidden = ($group->hidden === 0) ? 1 : 0;
+        return $group->save();
+    }
+
+    /**
      * Получает все группы из плейлиста и сохраняет те, которые отсутствуют в бд
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function updateGroupsFromPlaylist()
+    public static function updateGroupsFromPlaylist()
     {
         //масимальное значение поля sort для сортировки новых добавляемых групп
         $maxSortValue = ChannelGroup::all('sort')->max('sort');
@@ -133,20 +142,6 @@ class ChannelGroupController extends Controller
             $channelGroup->save();
         }
 
-        return redirect()->route('groups')->with('status', 'Список групп успешно обновлен из плейлиста');
-    }
-
-    /**
-     * @param Request $request
-     * @return mixed
-     * @throws \Exception
-     */
-    public function changeGroupVisibility(Request $request)
-    {
-        $id = $request->id;
-        if (!$id) throw new \Exception('Не указан id элемента');
-        $group = ChannelGroup::find((int)$id);
-        $group->hidden = ($group->hidden === 0) ? 1 : 0;
-        return $group->save();
+        return session()->flash('status', 'Список групп успешно обновлен из плейлиста');
     }
 }

@@ -11,4 +11,5 @@ class ChannelGroup extends Model
     protected $fillable = ['original_name', 'new_name', 'sort', 'own'];
 
     public $timestamps = false;
+
 }

@@ -49,6 +49,11 @@ class Playlist extends AFile implements ICreating
         $this->writeDataToPlaylist();
     }
 
+    /**
+     * Возвращает группы из плейлиста
+     *
+     * @return array
+     */
     public function getGroupsFromPlaylist()
     {
         $groups = [];
@@ -59,6 +64,23 @@ class Playlist extends AFile implements ICreating
             $groups[] = $channel->getGroup();
         }
         return array_values(array_unique($groups));
+    }
+
+    /**
+     * Возвращает каналы из плейлиста
+     *
+     * @return array
+     */
+    public function getChannelsFromPlaylist()
+    {
+        $channels = [];
+        /**
+         * @var Channel $channel
+         */
+        foreach ($this->channels as $key => $channel) {
+            $channels[$channel->getTitle()] = $channel->getGroup();
+        }
+        return ($channels);
     }
 
     /**

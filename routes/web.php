@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function () {
 
     // admin
     Route::get('/', function () {
@@ -74,7 +74,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     });
 
     /**
-     *
+     * admin/channels
      */
     Route::group(['prefix' => 'channels'], function () {
 

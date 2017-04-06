@@ -2,27 +2,9 @@
 
 namespace App;
 
-use App\Helpers\MbString;
-use Illuminate\Database\Eloquent\Model;
 
-class Channel extends Model
+class Channel
 {
-    protected $table = 'channels';
-
-    protected $fillable = [];
-
-    public $timestamps = false;
-
-    /**
-     * Связь с ChannelGroup
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function filter()
-    {
-        return $this->belongsTo(ChannelGroup::class);
-    }
-
     /**
      * @var array [title => 'title', group => 'group', url => 'url']
      */
@@ -33,7 +15,7 @@ class Channel extends Model
     private $template = '#EXTINF:0 group-title="{group}",{title}' . PHP_EOL . '{url}' . PHP_EOL;
 
     /**
-     * Channel constructor.
+     * DBChannel constructor.
      * @param array $channel
      * [title => 'title', group => 'group', url => 'url']
      */

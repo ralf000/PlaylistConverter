@@ -3,30 +3,7 @@
         <div class="panel-title">{{ $title }}</div>
     </div>
 
-    {{--Ошибки--}}
-    @if (count($errors) > 0)
-        <div class="panel-body">
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-    @endif
-    {{--/Ошибки--}}
-
-    {{--Сообщения--}}
-    @if (session('status'))
-        <div class="panel-body">
-            <div class="alert alert-success">
-                {{ session('status') }}
-            </div>
-        </div>
-    @endif
-    {{--/Сообщения--}}
-
+    @include('admin.include.errors&messages')
 
     <div class="panel-body">
         @if(!empty($data) && is_array($data))
