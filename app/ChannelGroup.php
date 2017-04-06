@@ -12,4 +12,8 @@ class ChannelGroup extends Model
 
     public $timestamps = false;
 
+    public function channels()
+    {
+        return $this->hasMany(DBChannel::class, 'group_id');
+    }
 }
