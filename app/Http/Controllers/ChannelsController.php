@@ -18,7 +18,7 @@ class ChannelsController extends Controller
     {
         $title = 'Каналы';
         $channels = DBChannel::all()->sortBy('sort')->toArray();
-        $groups = $this->getGroupsWithChannels();
+        $groups = $this->filterGroups();
 
         return view('admin.channels', compact('title', 'groups', 'channels'));
     }
@@ -143,9 +143,9 @@ class ChannelsController extends Controller
         return session()->flash('status', 'Список каналов успешно обновлен из плейлиста');
     }
 
-    private function getGroupsWithChannels()
+    private function filterGroups()
     {
-        $groups = ChannelGroup::all('id', 'new_name', 'sort')->sortBy('sort');
+        $groups = ChannelGroup::where('hidden', 0)->orderBy('sort')->get();
         $preparedGroups = [];
         foreach ($groups as $group) {
             if (count($group->channels) !== 0)
