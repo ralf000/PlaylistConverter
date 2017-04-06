@@ -107,7 +107,7 @@ class ChannelGroupController extends Controller
     public function changeGroupVisibility(Request $request)
     {
         $id = $request->id;
-        if (!$id) throw new \Exception('Не указан id элемента');
+        if (!$id) throw new \Exception('Не указан id группы');
         $group = ChannelGroup::find((int)$id);
         $group->hidden = ($group->hidden === 0) ? 1 : 0;
         return $group->save();

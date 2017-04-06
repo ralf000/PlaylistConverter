@@ -694,3 +694,12 @@ li.list-group-item {
     width: 40px !important;
     top: 0;
 }
+
+.narrow-col{
+    width: 5%;
+}
+
+a.accordion-title{
+    color: #333;
+    font-size: 14px;
+}

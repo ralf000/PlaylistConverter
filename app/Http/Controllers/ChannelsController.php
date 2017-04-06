@@ -12,13 +12,14 @@ class ChannelsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param DBChannel $channel
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index(DBChannel $channel)
+    public function index()
     {
         $title = 'Каналы';
-        return view('admin.channels', compact('title', 'channels'));
+        $channels = DBChannel::all()->sortBy('sort')->toArray();
+        $groups = ChannelGroup::all('id', 'new_name', 'sort')->sortBy('sort')->toArray();
+        return view('admin.channels', compact('title', 'groups', 'channels'));
     }
 
     /**
@@ -85,6 +86,20 @@ class ChannelsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function changeChannelVisibility(Request $request)
+    {
+        $id = $request->id;
+        if (!$id) throw new \Exception('Не указан id канала');
+        $channel = DBChannel::find((int)$id);
+        $channel->hidden = ($channel->hidden === 0) ? 1 : 0;
+        return $channel->save();
     }
 
     /**

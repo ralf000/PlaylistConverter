@@ -95,7 +95,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
 
         Route::delete('/', [
             'uses' => 'ChannelsController@destroy',
-            'as' => 'channels-delete'
+            'as' => 'channel-delete'
         ]);
 
     });
@@ -109,6 +109,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
         Route::post('/change-group-visibility', [
             'uses' => 'ChannelGroupController@changeGroupVisibility',
             'as' => 'change-group-visibility'
+        ]);
+
+        Route::post('/change-channel-visibility', [
+            'uses' => 'ChannelsController@changeChannelVisibility',
+            'as' => 'change-channel-visibility'
         ]);
 
     });
