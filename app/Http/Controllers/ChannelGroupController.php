@@ -113,35 +113,4 @@ class ChannelGroupController extends Controller
         return $group->save();
     }
 
-    /**
-     * Получает все группы из плейлиста и сохраняет те, которые отсутствуют в бд
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public static function updateGroupsFromPlaylist()
-    {
-        //масимальное значение поля sort для сортировки новых добавляемых групп
-        $maxSortValue = ChannelGroup::all('sort')->max('sort');
-
-        $playlist = new Playlist();
-        $groupsFromPlaylist = $playlist->getGroupsFromPlaylist();
-        $addedGroups = ChannelGroup::all(['new_name'])->toArray();
-        $preparedAddedGroups = [];
-        foreach ($addedGroups as $addedGroup) {
-            $preparedAddedGroups[] = mb_strtolower($addedGroup['new_name']);
-        }
-        foreach ($groupsFromPlaylist as $groupFromPlaylist) {
-            if (in_array(mb_strtolower($groupFromPlaylist), $preparedAddedGroups)) continue;
-
-            $channelGroup = new ChannelGroup();
-            $channelGroup->fill([
-                'original_name' => $groupFromPlaylist,
-                'new_name' => $groupFromPlaylist,
-                'sort' => ++$maxSortValue
-            ]);
-            $channelGroup->save();
-        }
-
-        return session()->flash('status', 'Список групп успешно обновлен из плейлиста');
-    }
 }

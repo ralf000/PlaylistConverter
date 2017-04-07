@@ -29,6 +29,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
 
     });
 
+    Route::post('/update-from-playlist', function () {
+        return \App\Http\Controllers\PlaylistController::syncWithPlaylist();
+    })->name('update-from-playlist');
+
     /**
      * admin/config
      */

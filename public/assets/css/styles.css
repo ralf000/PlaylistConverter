@@ -695,11 +695,15 @@ li.list-group-item {
     top: 0;
 }
 
-.narrow-col{
-    width: 5%;
+.narrow-col {
+    width: 4%;
 }
 
-a.accordion-title{
+a.accordion-title {
     color: #333;
     font-size: 14px;
+}
+
+.panel-group table {
+    margin-bottom: 0;
 }

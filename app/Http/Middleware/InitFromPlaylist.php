@@ -6,6 +6,7 @@ use App\ChannelGroup;
 use App\DBChannel;
 use App\Http\Controllers\ChannelGroupController;
 use App\Http\Controllers\ChannelsController;
+use App\Http\Controllers\PlaylistController;
 use Closure;
 
 class InitFromPlaylist
@@ -25,15 +26,15 @@ class InitFromPlaylist
         if (!config('main.inputPlaylist.value') && !$request->inputPlaylist) {
             session()->flash('info', 'Пожалуйста заполните все поля в настройках');
             if (\Route::currentRouteName() !== 'config')
-                return redirect()->route('config')->with('info', 'Пожалуйста заполните все поля в настройках');
+                return redirect()->route('config');
         }
         /**
          * Проверяет добавлены ли каналы и группы из плейлиста, указанного в настройках
          */
         if (ChannelGroup::all()->isEmpty())
-            ChannelGroupController::updateGroupsFromPlaylist();
+            PlaylistController::updateGroupsFromPlaylist();
         if (DBChannel::all()->isEmpty())
-            ChannelsController::updateChannelsFromPlaylist();
+            PlaylistController::updateChannelsFromPlaylist();
 
         return $next($request);
     }

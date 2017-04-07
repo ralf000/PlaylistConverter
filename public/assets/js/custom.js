@@ -1,6 +1,6 @@
 function addHandlersCustom() {
     addDeleteElementHandler();
-    // addChangeVisibilityElementHandler();
+    addUpdateFromPlaylistHandler();
 }
 
 /**
@@ -20,20 +20,18 @@ function addDeleteElementHandler() {
     });
 }
 
-/*function addChangeVisibilityElementHandler() {
-    var btn = $('button.change-visibility-btn');
-    btn.unbind();
-    btn.on('click', function (e) {
+/**
+ * Обновить список каналов из текущего плейлиста
+ */
+function addUpdateFromPlaylistHandler() {
+    $('button#update-from-playlist').on('click', function (e) {
         e.preventDefault();
-        var id = $(this).data('id');
-        var name = $(this).data('element-name');
-        var form = $('form#change-visibility');
-        form.find('input[name=id]').attr('value', id);
-        var showHideWord = (btn.hasClass('element-hide-btn')) ? 'скрыть' : 'показать';
-        if (confirm('Вы действительно хотите ' + showHideWord + ' элемент ' + '"' + name + '"?'))
-            form.submit();
+        var message = 'Вы действительно хотите обновить список групп и каналов из плейлиста, указанного в разделе "Настройки/Ссылка на плейлист"?';
+        if (confirm(message)) {
+            $('form#update-from-playlist-form').submit();
+        }
     });
-}*/
+}
 
 $(document).ready(function () {
 
