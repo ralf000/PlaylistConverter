@@ -22,7 +22,7 @@
                 <form class="form-horizontal" role="form" action="{{ route('groups-update') }}" method="post"
                       id="groups-form">
                     {{ csrf_field() }}
-                    <div id="sortable" class="groups-list">
+                    <div class="sortable">
                         @foreach ($groups as $group)
                             @include('admin.include.group')
                         @endforeach

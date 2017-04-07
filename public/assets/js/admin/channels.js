@@ -61,28 +61,8 @@ function addHandlersForChannels() {
     addSorting();
 }
 
-function initGroupsPosition() {
-    var groups = $('.groups-list').children('.group-element');
-    $.each(groups, function (id, group) {
-        var index = $(group).index();
-        $(group).children('input.sort').val(index);
-    })
-}
-
-/**
- * Сортировка групп
- */
-function addSorting() {
-    //сортировка групп
-    $("#sortable").sortable({
-        revert: true,
-        stop: function () {
-            initGroupsPosition();
-        }
-    });
-}
-
 $(function () {
+    initElementsPosition();
     addHandlersForChannels();
     addSorting();
 });

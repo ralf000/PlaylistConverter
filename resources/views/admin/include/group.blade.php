@@ -1,4 +1,4 @@
-<div class="ui-state-default group-element">
+<div class="sort-element">
     <input type="hidden" class="id-input" name="{{$group['id']}}[id]"
            value="{{$group['id']}}">
     <input type="hidden" name="{{$group['id']}}[original_name]"
@@ -7,10 +7,6 @@
            value="{{$group['sort']}}">
     <input type="hidden" name="{{$group['id']}}[disabled]" class="disable-tag"
            value="{{ $group['hidden'] }}">
-    {{--    @if($group['hidden'])
-            <input type="hidden" name="{{$group['id']}}[new_name]"
-                   value="{{$group['new_name']}}">
-        @endif--}}
 
     <div class="form-group">
         <span style="color: gray;">Оригинальное название: {{$group['original_name']}}</span>

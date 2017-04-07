@@ -51,7 +51,7 @@
                                             <th class="narrow-col">Удалить</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody class="sortable">
                                         @foreach($channels as $channel)
                                             @if($channel['group_id'] === $group['id'])
                                                 @include('admin.include.channel')

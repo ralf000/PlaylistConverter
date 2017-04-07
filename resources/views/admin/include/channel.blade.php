@@ -1,4 +1,4 @@
-<tr>
+<tr class="sort-element">
     <input type="hidden" class="id-input" name="{{$channel['id']}}[id]"
            value="{{$channel['id']}}">
     <input type="hidden" name="{{$channel['id']}}[original_name]"

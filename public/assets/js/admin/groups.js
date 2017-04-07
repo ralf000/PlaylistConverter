@@ -16,14 +16,6 @@ function sendChangeVisibilityAjax(el) {
 }
 
 function addHandlersForGroups() {
-    //Обновить список групп из текущего плейлиста
-    $('button#update-groups').on('click', function (e) {
-        e.preventDefault();
-        var message = 'Вы действительно хотите обновить список групп из плейлиста, указанного в разделе "Настройки/Ссылка на плейлист"?';
-        if (confirm(message)) {
-            $('form#update-groups-form').submit();
-        }
-    });
 
     //скрыть/показать группу в списке групп
     $('button.change-visibility-btn').on('click', function (e) {
@@ -58,27 +50,6 @@ function addHandlersForGroups() {
     });
 
     addSorting();
-}
-
-function initGroupsPosition() {
-    var groups = $('.groups-list').children('.group-element');
-    $.each(groups, function (id, group) {
-        var index = $(group).index();
-        $(group).children('input.sort').val(index);
-    })
-}
-
-/**
- * Сортировка групп
- */
-function addSorting() {
-    //сортировка групп
-    $("#sortable").sortable({
-        revert: true,
-        stop: function () {
-            initGroupsPosition();
-        }
-    });
 }
 
 $(function () {

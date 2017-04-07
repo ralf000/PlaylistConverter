@@ -21,7 +21,7 @@ function addDeleteElementHandler() {
 }
 
 /**
- * Обновить список каналов из текущего плейлиста
+ * Обновление списка каналов из текущего плейлиста
  */
 function addUpdateFromPlaylistHandler() {
     $('button#update-from-playlist').on('click', function (e) {
@@ -33,27 +33,34 @@ function addUpdateFromPlaylistHandler() {
     });
 }
 
-$(document).ready(function () {
+/**
+ * Присвоение полям input.sort порядковых значений
+ */
+function initElementsPosition() {
+    var elements = $('.sortable').children('.sort-element');
+    $.each(elements, function (id, element) {
+        var index = $(element).index();
+        $(element).find('input.sort').val(index);
+    });
+}
 
-    $(".submenu > a").click(function (e) {
-        e.preventDefault();
-        var $li = $(this).parent("li");
-        var $ul = $(this).next("ul");
-
-        if ($li.hasClass("open")) {
-            $ul.slideUp(350);
-            $li.removeClass("open");
-        } else {
-            $(".nav > li > ul").slideUp(350);
-            $(".nav > li").removeClass("open");
-            $ul.slideDown(350);
-            $li.addClass("open");
+/**
+ * Ининциализация сортировки
+ */
+function addSorting() {
+    //сортировка групп
+    $(".sortable").sortable({
+        revert: true,
+        stop: function () {
+            initElementsPosition();
         }
     });
+}
 
-    /**
-     * Подсвечивает активный пункт бокового меню
-     */
+/**
+ * Подсвечивает активный пункт бокового меню
+ */
+function initSidebar() {
     var menuItems = $('.sidebar ul.nav li');
     menuItems.removeClass('current');
     var path = location.href;
@@ -61,6 +68,11 @@ $(document).ready(function () {
     if (item && item.length === 1) {
         item.parent('li').addClass('current');
     }
+}
 
+$(function () {
+    initSidebar();
+    initElementsPosition();
+    addSorting();
     addHandlersCustom();
 });
