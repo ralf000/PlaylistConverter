@@ -19,7 +19,7 @@ class ChannelsController extends Controller
         $title = 'Каналы';
         $channels = DBChannel::all()->sortBy('sort')->toArray();
         //$groups = $this->filterGroups();
-        $groups = ChannelGroup::all('id', 'new_name', 'sort')->sortBy('sort')->toArray();
+        $groups = ChannelGroup::all()->sortBy('sort')->toArray();
         $groupsWithOwnChannels = ChannelGroup::where('channels.own', 1)
             ->join('channels', 'channel_groups.id', '=', 'channels.group_id')
             ->get(['channel_groups.id'])
