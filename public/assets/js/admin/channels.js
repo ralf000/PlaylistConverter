@@ -20,6 +20,7 @@ function addHandlersForChannels() {
     $('button.change-visibility-btn').on('click', function (e) {
         e.preventDefault();
         var btn = $(this);
+        var tdUrl = btn.closest('tr').find('td.td-url');
         sendChangeVisibilityAjax($(this));
         if (btn.hasClass('element-hide-btn')) {
             btn
@@ -37,7 +38,12 @@ function addHandlersForChannels() {
                 .attr('disabled', 'disabled')
                 .closest('tr')
                 .find('input.disable-tag')
-                .val(1)
+                .val(1);
+            if (tdUrl.length !== 0){
+                tdUrl.css('opacity', '0.4')
+                    .children('input[type=url')
+                    .attr('disabled', 'disabled');
+            }
         } else {
             btn
                 .removeClass('element-show-btn')
@@ -55,6 +61,11 @@ function addHandlersForChannels() {
                 .closest('table')
                 .find('input.disable-tag')
                 .val(0);
+            if (tdUrl.length !== 0){
+                tdUrl.removeAttr('style')
+                    .children('input[type=url')
+                    .removeAttr('disabled');
+            }
         }
     });
 

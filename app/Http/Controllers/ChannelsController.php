@@ -18,10 +18,14 @@ class ChannelsController extends Controller
     {
         $title = 'Каналы';
         $channels = DBChannel::all()->sortBy('sort')->toArray();
-        $groups = $this->filterGroups();
-        $allGroups = ChannelGroup::all('id', 'new_name', 'sort')->sortBy('sort')->toArray();
+        //$groups = $this->filterGroups();
+        $groups = ChannelGroup::all('id', 'new_name', 'sort')->sortBy('sort')->toArray();
+        $groupsWithOwnChannels = ChannelGroup::where('channels.own', 1)
+            ->join('channels', 'channel_groups.id', '=', 'channels.group_id')
+            ->get(['channel_groups.id'])
+            ->toArray();
 
-        return view('admin.channels', compact('title', 'groups', 'channels', 'allGroups'));
+        return view('admin.channels', compact('title', 'groups', 'channels', 'groupsWithOwnChannels'));
     }
 
     /**
@@ -39,10 +43,35 @@ class ChannelsController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function store(Request $request)
     {
-        //
+        //масимальное значение поля sort для сортировки новых добавляемых каналов
+        $maxSortValue = DBChannel::all('sort')->max('sort');
+
+        $input = $request->except(['_token', '_method']);
+
+        $validator = \Validator::make($input, [
+            'original_name' => 'required|unique:channels',
+            'url' => 'required|unique:channels|url',
+            'group_id' => 'required|integer|exists:channel_groups,id',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('channels')->withErrors($validator);
+        }
+
+        $channel = new DBChannel();
+        $channel->fill($input);
+        $channel->new_name = $channel->original_name;
+        $channel->sort = ++$maxSortValue;
+        $channel->own = 1;
+        if ($channel->save()) {
+            return redirect()->route('channels')->with('status', 'Новый канал успешно добавлен');
+        }
+
+        throw new \Exception('При добавлении нового канала что-то пошло не так');
     }
 
     /**
@@ -81,10 +110,15 @@ class ChannelsController extends Controller
 
             $validationRules = [
                 'id' => 'required|integer',
-                'original_name' => "required|string",
+                'original_name' => "required",
                 'sort' => 'required|integer',
                 'disabled' => 'required|integer',
             ];
+            if ($channelData['own']){
+                $validationRules += [
+                    'url' => "required|url|unique:channels,url,{$channelData['id']}"
+                ];
+            }
             if (!$channelData['disabled']) {
                 $validationRules += [
                     'new_name' => "required|unique:channels,new_name,{$channelData['id']}",
@@ -104,13 +138,19 @@ class ChannelsController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  int $id
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $channel = DBChannel::find((int)$request->id);
+        //если канал добавлен пользователем (own === 1) и передан верный id
+        if ($channel && $channel->own) {
+            DBChannel::destroy($channel->id);
+            return redirect()->route('channels')->with('status', 'Канал успешно удален');
+        }
+        throw new \Exception("Не удалось удалить канал с идентификатором {$request->id}");
     }
 
     /**
@@ -127,7 +167,7 @@ class ChannelsController extends Controller
         return $channel->save();
     }
 
-    private function filterGroups()
+    /*private function filterGroups()
     {
         $groups = ChannelGroup::where('hidden', 0)->orderBy('sort')->get();
         $preparedGroups = [];
@@ -136,6 +176,6 @@ class ChannelsController extends Controller
                 $preparedGroups[] = $group->toArray();
         }
         return $preparedGroups;
-    }
+    }*/
 
 }

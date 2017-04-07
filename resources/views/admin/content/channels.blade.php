@@ -47,6 +47,11 @@
                                             <th>Оригинальное название</th>
                                             <th>Новое название</th>
                                             <th>Группа</th>
+                                            @foreach($groupsWithOwnChannels as $groupWithOwnChannels)
+                                                @if($groupWithOwnChannels['id'] == $group['id'])
+                                                    <th>Ссылка</th>
+                                                @endif
+                                            @endforeach
                                             <th style="width: 10%">Скрыть</th>
                                             <th class="narrow-col">Удалить</th>
                                         </tr>

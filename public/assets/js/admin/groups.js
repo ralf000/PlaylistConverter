@@ -31,7 +31,7 @@ function addHandlersForGroups() {
                 .find('input[type=text]')
                 .css('opacity', '0.4')
                 .attr('disabled', 'disabled')
-                .closest('.group-element')
+                .closest('.sort-element')
                 .find('input.disable-tag')
                 .val(1);
         } else {
@@ -43,7 +43,7 @@ function addHandlersForGroups() {
                 .find('input[type=text]')
                 .removeAttr('style')
                 .removeAttr('disabled')
-                .closest('.group-element')
+                .closest('.sort-element')
                 .find('input.disable-tag')
                 .val(0);
         }

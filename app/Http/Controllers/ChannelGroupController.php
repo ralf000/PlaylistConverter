@@ -66,13 +66,21 @@ class ChannelGroupController extends Controller
 
         foreach ($input as $groupData) {
 
+            $validationRules = [
+                'id' => 'required|integer',
+                'original_name' => "required",
+                'sort' => 'required|integer',
+                'disabled' => 'required|integer',
+            ];
+
             if (!$groupData['disabled']) {
-                $validator = \Validator::make($groupData, [
-                    'new_name' => "required|unique:channel_groups,new_name,{$groupData['id']}"
-                ]);
-                if ($validator->fails()) {
-                    return redirect()->route('groups')->withErrors($validator);
-                }
+                $validationRules += [
+                    'new_name' => "required|unique:channel_groups,new_name,{$groupData['id']}",
+                ];
+            }
+            $validator = \Validator::make($groupData, $validationRules);
+            if ($validator->fails()) {
+                return redirect()->route('groups')->withErrors($validator);
             }
             $group = ChannelGroup::find($groupData['id']);
             $group->fill($groupData);
