@@ -33,7 +33,7 @@
                                             <span class="glyphicon glyphicon-arrow-down"></span>
                                         </a>
                                         </span>
-                                <input name="{{$group['id']}}[new_name]"
+                                <input name="group[{{$group['id']}}][new_name]"
                                        type="text"
                                        class="form-control"
                                        placeholder="{{$group['new_name']}}"
@@ -54,14 +54,10 @@
                                     <thead>
                                     <tr>
                                         <th class="narrow-col"> </th>
-                                        <th>Оригинальное название</th>
-                                        <th>Новое название</th>
+                                        {{--<th>Оригинальное название</th>--}}
+                                        <th>Название</th>
                                         <th>Группа</th>
-                                        @foreach($groupsWithOwnChannels as $groupWithOwnChannels)
-                                            @if($groupWithOwnChannels['id'] == $group['id'])
-                                                <th>Ссылка</th>
-                                            @endif
-                                        @endforeach
+                                        <th>Ссылка</th>
                                         <th style="width: 10%">Скрыть</th>
                                         <th class="narrow-col">Удалить</th>
                                     </tr>

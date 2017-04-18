@@ -6,6 +6,7 @@ use App\DBChannel;
 use App\ChannelGroup;
 use App\Playlist;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ChannelsController extends Controller
 {
@@ -18,14 +19,13 @@ class ChannelsController extends Controller
     {
         $title = 'Каналы';
         $channels = DBChannel::all()->sortBy('sort')->toArray();
-        //$groups = $this->filterGroups();
         $groups = ChannelGroup::all()->sortBy('sort')->toArray();
-        $groupsWithOwnChannels = ChannelGroup::where('channels.own', 1)
+        /*$groupsWithOwnChannels = ChannelGroup::where('channels.own', 1)
             ->join('channels', 'channel_groups.id', '=', 'channels.group_id')
             ->get(['channel_groups.id'])
-            ->toArray();
+            ->toArray();*/
 
-        return view('admin.channels', compact('title', 'groups', 'channels', 'groupsWithOwnChannels'));
+        return view('admin.channels', compact('title', 'groups', 'channels'));
     }
 
     /**
@@ -54,7 +54,7 @@ class ChannelsController extends Controller
 
         $validator = \Validator::make($input, [
             'original_name' => 'required|unique:channels',
-            'url' => 'required|unique:channels|url',
+            'original_url' => 'required|unique:channels|url',
             'group_id' => 'required|integer|exists:channel_groups,id',
         ]);
 
@@ -65,6 +65,7 @@ class ChannelsController extends Controller
         $channel = new DBChannel();
         $channel->fill($input);
         $channel->new_name = $channel->original_name;
+        $channel->new_url = $channel->original_url;
         $channel->sort = ++$maxSortValue;
         $channel->own = 1;
         if ($channel->save()) {
@@ -104,24 +105,20 @@ class ChannelsController extends Controller
      */
     public function update(Request $request)
     {
-        $input = $request->except(['_token']);
+        $input = $request->except(['_token'])['channel'];
 
-        foreach ($input as $channelData) {
+        foreach ($input as $id => $channelData) {
 
             $validationRules = [
                 'id' => 'required|integer',
-                'original_name' => "required",
+                //'original_name' => "required",
                 'sort' => 'required|integer',
                 'disabled' => 'required|integer',
             ];
-            if ($channelData['own']){
-                $validationRules += [
-                    'url' => "required|url|unique:channels,url,{$channelData['id']}"
-                ];
-            }
             if (!$channelData['disabled']) {
                 $validationRules += [
-                    'new_name' => "required|unique:channels,new_name,{$channelData['id']}",
+                    'new_name' => "required",
+                    'new_url' => "required|url|unique:channels,new_url,{$id}",
                     'group_id' => 'required|integer|exists:channel_groups,id',
                 ];
             }
@@ -166,16 +163,5 @@ class ChannelsController extends Controller
         $channel->hidden = ($channel->hidden === 0) ? 1 : 0;
         return $channel->save();
     }
-
-    /*private function filterGroups()
-    {
-        $groups = ChannelGroup::where('hidden', 0)->orderBy('sort')->get();
-        $preparedGroups = [];
-        foreach ($groups as $group) {
-            if (count($group->channels) !== 0)
-                $preparedGroups[] = $group->toArray();
-        }
-        return $preparedGroups;
-    }*/
 
 }

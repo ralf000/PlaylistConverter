@@ -1,18 +1,20 @@
 <tr class="sort-element">
-    <input type="hidden" class="id-input" name="{{$channel['id']}}[id]"
+    <input type="hidden" class="id-input" name="channel[{{$channel['id']}}][id]"
            value="{{$channel['id']}}">
-    <input type="hidden" name="{{$channel['id']}}[original_name]"
+    <input type="hidden" name="channel[{{$channel['id']}}][original_name]"
            value="{{$channel['original_name']}}">
-    <input type="hidden" name="{{$channel['id']}}[own]"
+    <input type="hidden" name="channel[{{$channel['id']}}][original_url]"
+           value="{{$channel['original_url']}}">
+    <input type="hidden" name="channel[{{$channel['id']}}][own]"
            value="{{ $channel['own'] }}">
-    <input type="hidden" name="{{$channel['id']}}[sort]" class="sort"
+    <input type="hidden" name="channel[{{$channel['id']}}][sort]" class="sort"
            value="{{$channel['sort']}}">
-    <input type="hidden" name="{{$channel['id']}}[disabled]" class="disable-tag"
+    <input type="hidden" name="channel[{{$channel['id']}}][disabled]" class="disable-tag"
            value="{{ $channel['hidden'] }}">
     <td><span class="btn btn-default glyphicon glyphicon-move sorting-btn"></span></td>
-    <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>{{$channel['original_name']}}</td>
+    {{--<td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>{{$channel['original_name']}}</td>--}}
     <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>
-        <input name="{{$channel['id']}}[new_name]"
+        <input name="channel[{{$channel['id']}}][new_name]"
                type="text" class="form-control"
                id="{{$channel['id']}}"
                placeholder="{{$channel['new_name']}}"
@@ -20,7 +22,7 @@
                 {{($channel['hidden'] !== 0) ? 'disabled="disabled"' : ''}}>
     </td>
     <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>
-        <select name="{{$channel['id']}}[group_id]"
+        <select name="channel[{{$channel['id']}}][group_id]"
                 id="group"
                 class="form-control"
                 {{($channel['hidden'] !== 0) ? 'disabled="disabled"' : ''}}>
@@ -32,15 +34,10 @@
             @endforeach
         </select>
     </td>
-    @foreach($groupsWithOwnChannels as $groupWithOwnChannels)
-        @if($groupWithOwnChannels['id'] == $group['id'])
-            <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!} class="td-url">
-                @if($channel['url'])
-                    <input name="{{$channel['id']}}[url]" type="url" class="form-control" id="url" value="{{$channel['url']}}">
-                @endif
-            </td>
-        @endif
-    @endforeach
+    <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!} class="td-url">
+        <input name="channel[{{$channel['id']}}][new_url]" type="url" class="form-control" id="new_url"
+               value="{{$channel['new_url']}}">
+    </td>
 
     <td>
         @if($channel['hidden'] === 0)
@@ -60,7 +57,7 @@
     <td>
         @if ($channel['own'])
             <button data-id="{{$channel['id']}}"
-                    data-element-name="{{$channel['new_name']}}"
+                    data-element-name="channel[{{$channel['new_name']}}]"
                     class="element-delete-btn btn btn-default"
                     type="button"><span class="glyphicon glyphicon-remove"></span></button>
         @endif

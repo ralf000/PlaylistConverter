@@ -67,23 +67,6 @@ class Playlist extends AFile implements ICreating
     }
 
     /**
-     * Возвращает каналы из плейлиста
-     *
-     * @return array
-     */
-    public function getChannelsFromPlaylist()
-    {
-        $channels = [];
-        /**
-         * @var Channel $channel
-         */
-        foreach ($this->channels as $key => $channel) {
-            $channels[$channel->getTitle()] = $channel->getGroup();
-        }
-        return ($channels);
-    }
-
-    /**
      * Парсит телеканалы из плейлиста
      */
     private function setChannelsFromPlaylist()

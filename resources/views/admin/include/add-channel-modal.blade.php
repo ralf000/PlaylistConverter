@@ -17,8 +17,8 @@
                                placeholder="Введите название канала">
                     </div>
                     <div class="form-group">
-                        <label for="url">Ссылка</label>
-                        <input name="url" type="url" class="form-control" id="url"
+                        <label for="original_url">Ссылка</label>
+                        <input name="original_url" type="url" class="form-control" id="original_url"
                                placeholder="Введите ссылку на канал">
                     </div>
                     <div class="form-group">

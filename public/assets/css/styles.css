@@ -707,3 +707,7 @@ a.accordion-title {
 .panel-group table {
     margin-bottom: 0;
 }
+
+button.change-visibility-btn {
+    min-width: 90px;
+}

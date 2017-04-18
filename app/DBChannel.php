@@ -9,7 +9,7 @@ class DBChannel extends Model
 {
     protected $table = 'channels';
 
-    protected $fillable = ['original_name', 'new_name', 'url', 'sort', 'own', 'group_id'];
+    protected $fillable = ['original_name', 'new_name', 'original_url', 'new_url', 'sort', 'own', 'group_id'];
 
     public $timestamps = false;
 

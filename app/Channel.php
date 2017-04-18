@@ -54,6 +54,14 @@ class Channel
     }
 
     /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->channel['url'];
+    }
+
+    /**
      * @param string $title
      */
     public function setTitle($title)
@@ -68,4 +76,6 @@ class Channel
     {
         $this->channel['group'] = $group;
     }
+
+    
 }

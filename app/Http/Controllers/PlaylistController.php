@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Channel;
 use App\ChannelGroup;
 use App\DBChannel;
 use App\Playlist;
@@ -63,7 +64,7 @@ class PlaylistController extends Controller
         $maxSortValue = DBChannel::all('sort')->max('sort');
 
         $playlist = new Playlist();
-        $channelsFromPlaylist = $playlist->getChannelsFromPlaylist();
+        $channelsFromPlaylist = $playlist->getChannels();
         $groupsFromDB = ChannelGroup::all('id', 'original_name')->toArray();
         $preparedGroupsFromDB = [];
         foreach ($groupsFromDB as $groupFromDB) {
@@ -74,15 +75,21 @@ class PlaylistController extends Controller
         foreach ($addedChannels as $addedChannel) {
             $preparedAddedChannels[] = mb_strtolower($addedChannel['new_name']);
         }
-        foreach ($channelsFromPlaylist as $channelFromPlaylist => $group) {
-            $group = mb_strtolower($group);
-            if (in_array(mb_strtolower($channelFromPlaylist), $preparedAddedChannels)) continue;
+        foreach ($channelsFromPlaylist as $channelFromPlaylist) {
+            /**
+             * @var Channel $channelFromPlaylist
+             */
+            $group = mb_strtolower($channelFromPlaylist->getGroup());
+            $title = mb_strtolower($channelFromPlaylist->getTitle());
+            if (in_array($title, $preparedAddedChannels)) continue;
             if (!in_array($group, $preparedGroupsFromDB)) continue;
 
             $channel = new DBChannel();
             $channel->fill([
-                'original_name' => $channelFromPlaylist,
-                'new_name' => $channelFromPlaylist,
+                'original_name' => $channelFromPlaylist->getTitle(),
+                'new_name' => $channelFromPlaylist->getTitle(),
+                'original_url' => $channelFromPlaylist->getUrl(),
+                'new_url' => $channelFromPlaylist->getUrl(),
                 'sort' => ++$maxSortValue,
                 'group_id' => array_search($group, $preparedGroupsFromDB)
             ]);
