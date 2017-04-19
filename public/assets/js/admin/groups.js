@@ -49,7 +49,7 @@ function addDeleteGroupHandler() {
         var name = $(this).data('name');
         var form = $('form#group-delete');
         form.find('input[name=id]').attr('value', id);
-        if (confirm('Вы действительно хотите удалить группу ' + '"' + name + '"?'))
+        if (confirm('Вы действительно хотите удалить группу ' + '"' + name + '"?\n Все каналы из группы будут перемещены во временную группу "Без группы"'))
             form.submit();
     });
 }

@@ -20,10 +20,6 @@ class ChannelsController extends Controller
         $title = 'Каналы';
         $channels = DBChannel::all()->sortBy('sort')->toArray();
         $groups = ChannelGroup::all()->sortBy('sort')->toArray();
-        /*$groupsWithOwnChannels = ChannelGroup::where('channels.own', 1)
-            ->join('channels', 'channel_groups.id', '=', 'channels.group_id')
-            ->get(['channel_groups.id'])
-            ->toArray();*/
 
         return view('admin.channels', compact('title', 'groups', 'channels'));
     }
@@ -76,28 +72,6 @@ class ChannelsController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
@@ -105,6 +79,8 @@ class ChannelsController extends Controller
      */
     public function update(Request $request)
     {
+        (new ChannelGroupController())->update($request);
+
         $input = $request->except(['_token'])['channel'];
 
         foreach ($input as $id => $channelData) {
@@ -130,6 +106,8 @@ class ChannelsController extends Controller
             $channel->fill($channelData);
             $channel->update();
         }
+        $this->checkNonameGroup();
+        
         return redirect()->route('channels')->with('status', 'Изменения успешно сохранены');
     }
 
@@ -144,6 +122,11 @@ class ChannelsController extends Controller
         $channel = DBChannel::find((int)$request->id);
         //если канал добавлен пользователем (own === 1) и передан верный id
         if ($channel && $channel->own) {
+
+            $channelGroupController = new ChannelGroupController();
+            if ($channelGroupController->emptyNonameGroup())
+                $channelGroupController->destroyNonameGroup();
+
             DBChannel::destroy($channel->id);
             return redirect()->route('channels')->with('status', 'Канал успешно удален');
         }
@@ -162,6 +145,16 @@ class ChannelsController extends Controller
         $channel = DBChannel::find((int)$id);
         $channel->hidden = ($channel->hidden === 0) ? 1 : 0;
         return $channel->save();
+    }
+
+    /**
+     * проверяет группу для каналов без группы на пустоту и удаляет
+     */
+    private function checkNonameGroup()
+    {
+        $channelGroupController = new ChannelGroupController();
+        if ($channelGroupController->emptyNonameGroup())
+            $channelGroupController->destroyNonameGroup();
     }
 
 }

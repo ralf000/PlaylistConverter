@@ -31,5 +31,5 @@
 @include('admin.include.add-channel-modal')
 @include('admin.include.add-group-modal')
 {{--/modals--}}
-<script src="{{ asset('/assets/js/admin/channels.js') }}"></script>
 <script src="{{ asset('/assets/js/admin/groups.js') }}"></script>
+<script src="{{ asset('/assets/js/admin/channels.js') }}"></script>

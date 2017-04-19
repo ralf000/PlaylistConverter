@@ -3,11 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\ChannelGroup;
+use App\DBChannel;
 use App\Playlist;
 use Illuminate\Http\Request;
 
 class ChannelGroupController extends Controller
 {
+    /**
+     * @const имя группы для каналов, не имеющих группы
+     */
+    const NONAMEGROUP = 'Без группы';
+
+
     /**
      * Display a listing of the resource.
      *
@@ -58,11 +65,10 @@ class ChannelGroupController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request)
     {
-        $input = $request->except(['_token']);
+        $input = $request->except(['_token'])['group'];
 
         foreach ($input as $groupData) {
 
@@ -86,7 +92,7 @@ class ChannelGroupController extends Controller
             $group->fill($groupData);
             $group->update();
         }
-        return redirect()->route('groups')->with('status', 'Изменения успешно сохранены');
+//        return redirect()->route('groups')->with('status', 'Изменения успешно сохранены');
     }
 
     /**
@@ -101,6 +107,11 @@ class ChannelGroupController extends Controller
         $group = ChannelGroup::find((int)$request->id);
         //если группа добавлена пользователем (own === 1) и передан верный id
         if ($group && $group->own) {
+            $this->changeGroupForDeleteChannels($group->id);
+
+            if ($this->emptyNonameGroup())
+                $this->destroyNonameGroup();
+
             ChannelGroup::destroy($group->id);
             return redirect()->route('channels')->with('status', 'Группа успешно удалена');
         }
@@ -119,6 +130,101 @@ class ChannelGroupController extends Controller
         $group = ChannelGroup::find((int)$id);
         $group->hidden = ($group->hidden === 0) ? 1 : 0;
         return $group->save();
+    }
+
+    /**
+     * Меняет группу на группу для каналов без группы у каналов из удаляемой группы
+     *
+     * @param $deletedGroupId
+     * @throws \Exception
+     */
+    private function changeGroupForDeleteChannels($deletedGroupId)
+    {
+        $channelsFromGroup = DBChannel::all()->where('group_id', $deletedGroupId);
+        if (!count($channelsFromGroup))
+            return;
+
+        $nonameGroupId = $this->addNonameGroup();
+        foreach ($channelsFromGroup as $channelFromGroup) {
+            $channelFromGroup->group_id = $nonameGroupId;
+            $channelFromGroup->save();
+        }
+    }
+
+    /**
+     * Проверяет группу для каналов для групп на пустоту
+     *
+     * @return bool
+     */
+    public function emptyNonameGroup() : bool
+    {
+        $nonameGroupId = $this->getNonameGroupId();
+        $nonameGroupChannels = DBChannel::all()->where('group_id', $nonameGroupId);
+        return count($nonameGroupChannels) === 0;
+    }
+
+    /**
+     * Проверяет наличие группы для каналов без группы и каналов в ней
+     *
+     * @return bool
+     */
+    private function hasNonameGroup() : bool
+    {
+        $groupId = $this->getNonameGroupId();
+        if ($groupId === false) return false;
+
+        $channels = DBChannel::where('group_id', $groupId);
+        if (count($channels)) return false;
+
+        return true;
+    }
+
+    /**
+     * Создает группу для каналов без группы
+     *
+     * @return int|bool id новой группы
+     * @throws \Exception
+     */
+    private function addNonameGroup() : int
+    {
+        if ($this->hasNonameGroup()) {
+            return $this->getNonameGroupId();
+        }
+
+        $group = new ChannelGroup();
+        $group->original_name = self::NONAMEGROUP;
+        $group->new_name = self::NONAMEGROUP;
+        if ($group->save())
+            return $group->id;
+        else
+            throw new \Exception('Не удалось создать группу ' . self::NONAMEGROUP);
+    }
+
+    /**
+     * Удаляет группу, созданную для каналов без группы
+     *
+     * @return bool|int id удаляемой группы
+     */
+    public function destroyNonameGroup() : int
+    {
+        $groupId = $this->getNonameGroupId();
+        if ($groupId !== false)
+            return ChannelGroup::destroy($groupId);
+        return false;
+    }
+
+    /**
+     * Получает id группы для каналов без группы
+     *
+     * @return int
+     */
+    private function getNonameGroupId() : int
+    {
+        $group = ChannelGroup::where('original_name', self::NONAMEGROUP)->first();
+        if (count($group))
+            return $group->id;
+        else
+            return false;
     }
 
 }
