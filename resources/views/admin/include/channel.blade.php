@@ -11,7 +11,7 @@
            value="{{$channel['sort']}}">
     <input type="hidden" name="channel[{{$channel['id']}}][disabled]" class="disable-tag"
            value="{{ $channel['hidden'] }}">
-    <td><span class="btn btn-default glyphicon glyphicon-move sorting-btn"></span></td>
+    <td><span class="btn btn-default glyphicon glyphicon-move sorting-btn" title="Сортировать"></span></td>
     {{--<td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>{{$channel['original_name']}}</td>--}}
     <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>
         <input name="channel[{{$channel['id']}}][new_name]"
@@ -36,20 +36,20 @@
     </td>
     <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!} class="td-url">
         <input name="channel[{{$channel['id']}}][new_url]" type="url" class="form-control" id="new_url"
-               value="{{$channel['new_url']}}">
+               value="{{$channel['new_url']}}" {{($channel['hidden'] !== 0) ? 'disabled="disabled"' : ''}}>
     </td>
 
     <td>
         @if($channel['hidden'] === 0)
             <button data-id="{{$channel['id']}}"
                     data-token="{{ csrf_token() }}"
-                    class="change-visibility-btn element-hide-btn btn btn-default"
+                    class="change-channel-visibility-btn channel-hide-btn btn btn-default"
                     type="button">Скрыть
             </button>
         @else
             <button data-id="{{$channel['id']}}"
                     data-token="{{ csrf_token() }}"
-                    class="change-visibility-btn element-show-btn btn btn-default"
+                    class="change-channel-visibility-btn channel-show-btn btn btn-default"
                     type="button">Показать
             </button>
         @endif
@@ -57,8 +57,8 @@
     <td>
         @if ($channel['own'])
             <button data-id="{{$channel['id']}}"
-                    data-element-name="channel[{{$channel['new_name']}}]"
-                    class="element-delete-btn btn btn-default"
+                    data-name="{{$channel['new_name']}}"
+                    class="channel-delete-btn btn btn-default"
                     type="button"><span class="glyphicon glyphicon-remove"></span></button>
         @endif
     </td>

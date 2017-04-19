@@ -1,52 +1,80 @@
 <div class="sort-element">
-    <input type="hidden" class="id-input" name="{{$group['id']}}[id]"
+
+    <input type="hidden" class="id-input" name="group[{{$group['id']}}][id]"
            value="{{$group['id']}}">
-    <input type="hidden" name="{{$group['id']}}[original_name]"
+    <input type="hidden" name="group[{{$group['id']}}][original_name]"
            value="{{$group['original_name']}}">
-    <input type="hidden" name="{{$group['id']}}[sort]" class="sort"
+    <input type="hidden" name="group[{{$group['id']}}][sort]" class="sort"
            value="{{$group['sort']}}">
-    <input type="hidden" name="{{$group['id']}}[disabled]" class="disable-tag"
+    <input type="hidden" name="group[{{$group['id']}}][disabled]" class="disable-tag"
            value="{{ $group['hidden'] }}">
 
     <div class="form-group">
-        <span style="color: gray;">Оригинальное название: {{$group['original_name']}}</span>
         <div class="input-group">
-            <span class="input-group-btn">
-                <span class="btn btn-default glyphicon glyphicon-move sorting-btn"></span>
-            </span>
+        <span class="input-group-btn">
+            <span class="btn btn-default glyphicon glyphicon-move sorting-btn"></span>
+            <a role="button" data-toggle="collapse" data-parent="#accordion"
+               href="#{{$group['id']}}" title="Развернуть"
+               aria-expanded="true" aria-controls="{{$group['id']}}"
+               class="btn btn-default accordion-title collapsed">
+                <span class="glyphicon glyphicon-arrow-down"></span>
+            </a>
+        </span>
+            <input name="group[{{$group['id']}}][new_name]"
+                   type="text" class="form-control"
+                   placeholder="{{$group['new_name']}}"
+                   {!! ($group['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}
+                   value="{{$group['new_name']}}"
+                    {{($group['hidden'] !== 0) ? 'disabled="disabled"' : ''}}>
+        <span class="input-group-btn">
             @if($group['hidden'] === 0)
-                <input name="{{$group['id']}}[new_name]"
-                       type="text" class="form-control"
-                       id="{{$group['id']}}"
-                       placeholder="{{$group['new_name']}}"
-                       value="{{$group['new_name']}}">
+                <button data-id="{{$group['id']}}"
+                        data-token="{{ csrf_token() }}"
+                        class="change-group-visibility-btn group-hide-btn btn btn-default"
+                        type="button">Скрыть</button>
             @else
-                <input name="{{$group['id']}}[new_name]"
-                       type="text" class="form-control"
-                       id="{{$group['id']}}"
-                       placeholder="{{$group['new_name']}}"
-                       style="opacity: 0.4"
-                       value="{{$group['new_name']}}" disabled>
+                <button data-id="{{$group['id']}}"
+                        data-token="{{ csrf_token() }}"
+                        class="change-group-visibility-btn group-show-btn btn btn-default"
+                        type="button">Показать</button>
             @endif
-            <span class="input-group-btn">
-                @if($group['hidden'] === 0)
-                    <button data-id="{{$group['id']}}"
-                            data-token="{{ csrf_token() }}"
-                            class="change-visibility-btn element-hide-btn btn btn-default"
-                            type="button">Скрыть</button>
-                @else
-                    <button data-id="{{$group['id']}}"
-                            data-token="{{ csrf_token() }}"
-                            class="change-visibility-btn element-show-btn btn btn-default"
-                            type="button">Показать</button>
-                @endif
-                @if ($group['own'])
-                    <button data-id="{{$group['id']}}"
-                            data-element-name="{{$group['new_name']}}"
-                            class="element-delete-btn btn btn-default"
-                            type="button"><span class="glyphicon glyphicon-remove"></span></button>
-                @endif
-            </span>
+            @if ($group['own'])
+                <button data-id="{{$group['id']}}"
+                        data-name="{{$group['new_name']}}"
+                        class="group-delete-btn btn btn-default"
+                        type="button"><span class="glyphicon glyphicon-remove"></span></button>
+            @endif
+        </span>
+        </div>
+    </div>
+    <div class="row">
+        <div id="{{$group['id']}}"
+             class="panel-collapse collapse" role="tabpanel"
+             aria-labelledby=heading-group-{{$group['id']}}>
+            <table cellpadding="0"
+                   cellspacing="0"
+                   border="0"
+                   class="table table-striped"
+                    {!! ($group['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>
+                <thead>
+                <tr>
+                    <th class="narrow-col"> </th>
+                    {{--<th>Оригинальное название</th>--}}
+                    <th>Название</th>
+                    <th>Группа</th>
+                    <th>Ссылка</th>
+                    <th style="width: 10%">Скрыть</th>
+                    <th class="narrow-col">Удалить</th>
+                </tr>
+                </thead>
+                <tbody class="sortable sortable-channels">
+                @foreach($channels as $channel)
+                    @if($channel['group_id'] === $group['id'])
+                        @include('admin.include.channel')
+                    @endif
+                @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

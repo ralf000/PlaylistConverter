@@ -1,23 +1,5 @@
 function addHandlersCustom() {
-    addDeleteElementHandler();
     addUpdateFromPlaylistHandler();
-}
-
-/**
- * Обработтчик для удаления элементов
- */
-function addDeleteElementHandler() {
-    var btn = $('button.element-delete-btn');
-    btn.unbind();
-    btn.on('click', function (e) {
-        e.preventDefault();
-        var id = $(this).data('id');
-        var name = $(this).data('element-name');
-        var form = $('form#element-delete');
-        form.find('input[name=id]').attr('value', id);
-        if (confirm('Вы действительно хотите удалить элемент ' + '"' + name + '"?'))
-            form.submit();
-    });
 }
 
 /**
@@ -36,24 +18,11 @@ function addUpdateFromPlaylistHandler() {
 /**
  * Присвоение полям input.sort порядковых значений
  */
-function initElementsPosition() {
-    var elements = $('.sortable').children('.sort-element');
+function initElementsPosition(sortedList) {
+    var elements = sortedList.children('.sort-element');
     $.each(elements, function (id, element) {
         var index = $(element).index();
         $(element).find('input.sort').val(index);
-    });
-}
-
-/**
- * Ининциализация сортировки
- */
-function addSorting() {
-    //сортировка групп
-    $(".sortable").sortable({
-        revert: true,
-        stop: function () {
-            initElementsPosition();
-        }
     });
 }
 
@@ -72,7 +41,5 @@ function initSidebar() {
 
 $(function () {
     initSidebar();
-    initElementsPosition();
-    addSorting();
     addHandlersCustom();
 });

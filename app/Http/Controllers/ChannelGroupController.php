@@ -39,7 +39,7 @@ class ChannelGroupController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('groups')->withErrors($validator);
+            return redirect()->route('channels')->withErrors($validator);
         }
 
         $group = new ChannelGroup();
@@ -48,7 +48,7 @@ class ChannelGroupController extends Controller
         $group->sort = ++$maxSortValue;
         $group->own = 1;
         if ($group->save()) {
-            return redirect()->route('groups')->with('status', 'Новая группа успешно добавлена');
+            return redirect()->route('channels')->with('status', 'Новая группа успешно добавлена');
         }
 
         throw new \Exception('При добавлении новой группы что-то пошло не так');
@@ -80,7 +80,7 @@ class ChannelGroupController extends Controller
             }
             $validator = \Validator::make($groupData, $validationRules);
             if ($validator->fails()) {
-                return redirect()->route('groups')->withErrors($validator);
+                return redirect()->route('channels')->withErrors($validator);
             }
             $group = ChannelGroup::find($groupData['id']);
             $group->fill($groupData);
@@ -102,7 +102,7 @@ class ChannelGroupController extends Controller
         //если группа добавлена пользователем (own === 1) и передан верный id
         if ($group && $group->own) {
             ChannelGroup::destroy($group->id);
-            return redirect()->route('groups')->with('status', 'Группа успешно удалена');
+            return redirect()->route('channels')->with('status', 'Группа успешно удалена');
         }
         throw new \Exception("Не удалось удалить группу с идентификатором {$request->id}");
     }

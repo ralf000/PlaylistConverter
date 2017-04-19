@@ -1,4 +1,7 @@
-function sendChangeVisibilityAjax(el) {
+//globals
+var sortedGroupsList = $(".sortable-groups");
+
+function sendChangeGroupVisibilityAjax(el) {
     $.ajax({
         method: 'post',
         url: '/admin/ajax/change-group-visibility',
@@ -15,44 +18,89 @@ function sendChangeVisibilityAjax(el) {
     });
 }
 
+/**
+ * Ининциализация сортировки каналов
+ */
+function addSortingGroups() {
+    //сортировка групп
+    $(".sortable-groups").sortable({
+        revert: true,
+        /*start: function () {
+            var collapseButtons = $('a[data-toggle=collapse]');
+            $.each(collapseButtons, function (id, button) {
+                if (!$(button).hasClass('collapsed')) {
+                }
+            })
+        },*/
+        stop: function () {
+            initElementsPosition(sortedGroupsList);
+        }
+    });
+}
+
+/**
+ * Обработтчик для удаления элементов
+ */
+function addDeleteGroupHandler() {
+    var btn = $('button.group-delete-btn');
+    btn.on('click', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+        var form = $('form#group-delete');
+        form.find('input[name=id]').attr('value', id);
+        if (confirm('Вы действительно хотите удалить группу ' + '"' + name + '"?'))
+            form.submit();
+    });
+}
+
 function addHandlersForGroups() {
 
+    addDeleteGroupHandler();
+    addSortingGroups();
+
     //скрыть/показать группу в списке групп
-    $('button.change-visibility-btn').on('click', function (e) {
+    $('button.change-group-visibility-btn').on('click', function (e) {
         e.preventDefault();
         var btn = $(this);
-        sendChangeVisibilityAjax($(this));
-        if (btn.hasClass('element-hide-btn')) {
+        sendChangeGroupVisibilityAjax($(this));
+        if (btn.hasClass('group-hide-btn')) {
             btn
-                .removeClass('element-hide-btn')
-                .addClass('element-show-btn')
+                .removeClass('group-hide-btn')
+                .addClass('group-show-btn')
                 .text('Показать')
                 .closest('.form-group')
                 .find('input[type=text]')
                 .css('opacity', '0.4')
                 .attr('disabled', 'disabled')
+                .closest('.form-group')
+                .next('.row')
+                .find('table')
+                .css('opacity', '0.4')
                 .closest('.sort-element')
                 .find('input.disable-tag')
                 .val(1);
         } else {
             btn
-                .removeClass('element-show-btn')
-                .addClass('element-hide-btn')
+                .removeClass('group-show-btn')
+                .addClass('group-hide-btn')
                 .text('Скрыть')
                 .closest('.form-group')
                 .find('input[type=text]')
                 .removeAttr('style')
                 .removeAttr('disabled')
+                .closest('.form-group')
+                .next('.row')
+                .find('table')
+                .removeAttr('style')
                 .closest('.sort-element')
                 .find('input.disable-tag')
                 .val(0);
         }
     });
-
-    addSorting();
 }
 
 $(function () {
+    initElementsPosition(sortedGroupsList);
     addHandlersForGroups();
-    addSorting();
 });
