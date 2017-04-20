@@ -8,6 +8,9 @@
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#add-group">
         Добавить группу
     </button>
+    <button type="button" class="btn btn-default pull-right" id="reset-playlist">
+        Сбросить все данные из плейлиста
+    </button>
     <button type="button" class="btn btn-default pull-right" id="update-from-playlist">
         Синхронизировать с плейлистом
     </button>
@@ -48,3 +51,9 @@
     {{ csrf_field() }}
 </form>
 {{--/Форма для обновления списка каналов и групп из плейлиста--}}
+
+{{--Форма для сброса всех данных из плейлиста--}}
+<form action="{{ route('reset-playlist') }}" method="post" id="reset-playlist-form">
+    {{ csrf_field() }}
+</form>
+{{--/Форма для сброса всех данных из плейлиста--}}

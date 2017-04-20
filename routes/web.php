@@ -29,9 +29,19 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
 
     });
 
+    /**
+     * Синхронизировать с плейлистом
+     */
     Route::post('/update-from-playlist', function () {
         return \App\Http\Controllers\PlaylistController::syncWithPlaylist();
     })->name('update-from-playlist');
+
+    /**
+     * Сбросить все данные из плейлиста
+     */
+    Route::post('/reset-playlist', function () {
+        return \App\Http\Controllers\PlaylistController::resetPlaylist();
+    })->name('reset-playlist');
 
     /**
      * admin/config

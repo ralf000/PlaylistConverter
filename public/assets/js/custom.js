@@ -5,6 +5,7 @@ var sortedChannelsList = $(".sortable-channels");
 
 function addHandlersCustom() {
     addUpdateFromPlaylistHandler();
+    addResetPlaylistHandler();
 }
 
 /**
@@ -16,6 +17,19 @@ function addUpdateFromPlaylistHandler() {
         var message = 'Вы действительно хотите обновить список групп и каналов из плейлиста, указанного в разделе "Настройки/Ссылка на плейлист"?';
         if (confirm(message)) {
             $('form#update-from-playlist-form').submit();
+        }
+    });
+}
+
+/**
+ * Обновление списка каналов из текущего плейлиста
+ */
+function addResetPlaylistHandler() {
+    $('button#reset-playlist').on('click', function (e) {
+        e.preventDefault();
+        var message = 'Вы действительно хотите удалить все текущие группы и каналы?\n При этом данные из текущего плейлиста будут загружены автоматически';
+        if (confirm(message)) {
+            $('form#reset-playlist-form').submit();
         }
     });
 }

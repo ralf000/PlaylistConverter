@@ -96,7 +96,18 @@ class PlaylistController extends Controller
             ]);
             $channel->save();
         }
+    }
 
+    /**
+     * Очищает таблицу channel_groups
+     */
+    public static function resetPlaylist()
+    {
+        $groups = ChannelGroup::all();
+        foreach ($groups as $group) {
+            ChannelGroup::destroy($group->id);
+        }
+        return redirect()->route('channels')->with('status', 'Плейлист успешно очищен');
     }
 
 }
