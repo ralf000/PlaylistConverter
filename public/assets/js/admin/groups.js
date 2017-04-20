@@ -1,5 +1,3 @@
-//globals
-var sortedGroupsList = $(".sortable-groups");
 
 function sendChangeGroupVisibilityAjax(el) {
     $.ajax({
@@ -14,26 +12,6 @@ function sendChangeGroupVisibilityAjax(el) {
             alert(data.error);
         } else {
             //если успешно - ничего не делать
-        }
-    });
-}
-
-/**
- * Ининциализация сортировки каналов
- */
-function addSortingGroups() {
-    //сортировка групп
-    $(".sortable-groups").sortable({
-        revert: true,
-        /*start: function () {
-            var collapseButtons = $('a[data-toggle=collapse]');
-            $.each(collapseButtons, function (id, button) {
-                if (!$(button).hasClass('collapsed')) {
-                }
-            })
-        },*/
-        stop: function () {
-            initElementsPosition(sortedGroupsList);
         }
     });
 }
@@ -54,9 +32,20 @@ function addDeleteGroupHandler() {
     });
 }
 
+function addResetGroupHandler() {
+    var btn = $('button.group-reset-btn');
+    btn.on('click', function (e) {
+        e.preventDefault();
+        var group = $(this).closest('.group-block');
+        var originalName = group.children('input.original-name').val();
+        group.find('.form-group input.new-name').val(originalName);
+    });
+}
+
 function addHandlersForGroups() {
 
     addDeleteGroupHandler();
+    addResetGroupHandler();
     addSortingGroups();
 
     //скрыть/показать группу в списке групп
@@ -101,6 +90,5 @@ function addHandlersForGroups() {
 }
 
 $(function () {
-    initElementsPosition(sortedGroupsList);
     addHandlersForGroups();
 });

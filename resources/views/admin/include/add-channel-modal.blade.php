@@ -23,7 +23,7 @@
                     </div>
                     <div class="form-group">
                         <label for="group">Группа</label>
-                        <select name="group_id" id="group" class="form-control">
+                        <select name="original_group_id" id="group" class="form-control">
                             @foreach($groups as $groupModal)
                                 <option value="{{$groupModal['id']}}">
                                     {{$groupModal['new_name']}}

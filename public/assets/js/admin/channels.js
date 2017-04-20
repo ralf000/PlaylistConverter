@@ -1,5 +1,3 @@
-//globals
-var sortedChannelsList = $('.sortable-channels');
 
 function sendChangeChannelVisibilityAjax(el) {
     $.ajax({
@@ -14,19 +12,6 @@ function sendChangeChannelVisibilityAjax(el) {
             alert(data.error);
         } else {
             //если успешно - ничего не делать
-        }
-    });
-}
-
-/**
- * Ининциализация сортировки каналов
- */
-function addSortingChannels() {
-    //сортировка групп
-    sortedChannelsList.sortable({
-        revert: true,
-        stop: function () {
-            initElementsPosition(sortedChannelsList);
         }
     });
 }
@@ -47,9 +32,31 @@ function addDeleteChannelHandler() {
     });
 }
 
+function addResetChannelHandler() {
+    var btn = $('button.channel-reset-btn');
+    btn.on('click', function (e) {
+        e.preventDefault();
+        var channel = $(this).closest('tr');
+        var originalName = channel.children('input.original-name').val();
+        var originalUrl = channel.children('input.original-url').val();
+        var originalGroupId = channel.children('input.original-group-id').val();
+        channel.find('input.new-name').val(originalName);
+        channel.find('input.new-url').val(originalUrl);
+        var groups = channel.find('select.group-id option');
+        $.each(groups, function (id, group) {
+            group = $(group);
+            if (group.attr('selected'))
+                group.removeAttr('selected');
+            if (group.attr('value') == originalGroupId)
+                group.attr('selected', 'selected');
+        });
+    });
+}
+
 function addHandlersForChannels() {
 
     addDeleteChannelHandler();
+    addResetChannelHandler();
     addSortingChannels();
 
     //скрыть/показать группу в списке групп
@@ -110,6 +117,5 @@ function addHandlersForChannels() {
 }
 
 $(function () {
-    initElementsPosition(sortedChannelsList);
     addHandlersForChannels();
 });

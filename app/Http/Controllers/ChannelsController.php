@@ -49,9 +49,9 @@ class ChannelsController extends Controller
         $input = $request->except(['_token', '_method']);
 
         $validator = \Validator::make($input, [
-            'original_name' => 'required|unique:channels',
+            'original_name' => 'required',
             'original_url' => 'required|unique:channels|url',
-            'group_id' => 'required|integer|exists:channel_groups,id',
+            'original_group_id' => 'required|integer|exists:channel_groups,id',
         ]);
 
         if ($validator->fails()) {
@@ -62,6 +62,7 @@ class ChannelsController extends Controller
         $channel->fill($input);
         $channel->new_name = $channel->original_name;
         $channel->new_url = $channel->original_url;
+        $channel->group_id = $channel->original_group_id;
         $channel->sort = ++$maxSortValue;
         $channel->own = 1;
         if ($channel->save()) {
@@ -76,6 +77,7 @@ class ChannelsController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function update(Request $request)
     {
@@ -87,7 +89,6 @@ class ChannelsController extends Controller
 
             $validationRules = [
                 'id' => 'required|integer',
-                //'original_name' => "required",
                 'sort' => 'required|integer',
                 'disabled' => 'required|integer',
             ];
@@ -103,11 +104,18 @@ class ChannelsController extends Controller
                 return redirect()->route('channels')->withErrors($validator);
             }
             $channel = DBChannel::find($channelData['id']);
+
+            if ($channel->original_name !== $channelData['original_name']
+                || $channel->original_url !== $channelData['original_url']
+                || (int) $channel->original_group_id !== (int) $channelData['original_group_id']
+            ) {
+                throw new \Exception('Переданы неверные данные для канала ' . $channel->new_name);
+            }
             $channel->fill($channelData);
             $channel->update();
         }
         $this->checkNonameGroup();
-        
+
         return redirect()->route('channels')->with('status', 'Изменения успешно сохранены');
     }
 

@@ -91,6 +91,7 @@ class PlaylistController extends Controller
                 'original_url' => $channelFromPlaylist->getUrl(),
                 'new_url' => $channelFromPlaylist->getUrl(),
                 'sort' => ++$maxSortValue,
+                'original_group_id' => array_search($group, $preparedGroupsFromDB),
                 'group_id' => array_search($group, $preparedGroupsFromDB)
             ]);
             $channel->save();

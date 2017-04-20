@@ -1,8 +1,9 @@
-<div class="sort-element">
+<div class="sort-element group-block">
 
     <input type="hidden" class="id-input" name="group[{{$group['id']}}][id]"
            value="{{$group['id']}}">
     <input type="hidden" name="group[{{$group['id']}}][original_name]"
+           class="original-name"
            value="{{$group['original_name']}}">
     <input type="hidden" name="group[{{$group['id']}}][sort]" class="sort"
            value="{{$group['sort']}}">
@@ -21,7 +22,7 @@
             </a>
         </span>
             <input name="group[{{$group['id']}}][new_name]"
-                   type="text" class="form-control"
+                   type="text" class="form-control new-name"
                    placeholder="{{$group['new_name']}}"
                    {!! ($group['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}
                    value="{{$group['new_name']}}"
@@ -33,11 +34,15 @@
                         class="change-group-visibility-btn group-hide-btn btn btn-default"
                         type="button">Скрыть</button>
             @else
-                <button data-id="{{$group['id']}}"
+                <a data-id="{{$group['id']}}"
                         data-token="{{ csrf_token() }}"
                         class="change-group-visibility-btn group-show-btn btn btn-default"
-                        type="button">Показать</button>
+                        type="button">Показать</a>
             @endif
+            <button class="group-reset-btn btn btn-default"
+                    title="Сбросить изменения">
+                <span class="glyphicon glyphicon-share-alt"></span>
+            </button>
             @if ($group['own'])
                 <button data-id="{{$group['id']}}"
                         data-name="{{$group['new_name']}}"
@@ -58,13 +63,14 @@
                     {!! ($group['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>
                 <thead>
                 <tr>
-                    <th class="narrow-col"> </th>
+                    <th class="narrow-col"></th>
                     {{--<th>Оригинальное название</th>--}}
                     <th>Название</th>
                     <th>Группа</th>
                     <th>Ссылка</th>
                     <th style="width: 10%">Скрыть</th>
-                    <th class="narrow-col">Удалить</th>
+                    <th style="width: 4%"></th>
+                    <th style="width: 4%"></th>
                 </tr>
                 </thead>
                 <tbody class="sortable sortable-channels">

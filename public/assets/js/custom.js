@@ -1,3 +1,8 @@
+//globals
+var sortedGroupsList = $(".sortable-groups");
+var sortedChannelsList = $(".sortable-channels");
+
+
 function addHandlersCustom() {
     addUpdateFromPlaylistHandler();
 }
@@ -18,11 +23,41 @@ function addUpdateFromPlaylistHandler() {
 /**
  * Присвоение полям input.sort порядковых значений
  */
-function initElementsPosition(sortedList) {
-    var elements = sortedList.children('.sort-element');
-    $.each(elements, function (id, element) {
-        var index = $(element).index();
-        $(element).find('input.sort').val(index);
+function sort() {
+    var groups = sortedGroupsList.children('.sort-element');
+    var channels;
+    $.each(groups, function (groupIndex, group) {
+        $(group).find('input.sort').val(groupIndex);
+        channels = $(group).find('tbody.sortable tr.sort-element');
+        $.each(channels, function (channelIndex, channel) {
+            $(channel).find('input.sort').val(channelIndex);
+        });
+    });
+}
+
+/**
+ * Ининциализация сортировки каналов
+ */
+function addSortingGroups() {
+    //сортировка групп
+    sortedGroupsList.sortable({
+        revert: true,
+        stop: function () {
+            sort();
+        }
+    });
+}
+
+/**
+ * Ининциализация сортировки каналов
+ */
+function addSortingChannels() {
+    //сортировка групп
+    sortedChannelsList.sortable({
+        revert: true,
+        stop: function () {
+            sort();
+        }
     });
 }
 
@@ -41,5 +76,6 @@ function initSidebar() {
 
 $(function () {
     initSidebar();
+    sort();
     addHandlersCustom();
 });
