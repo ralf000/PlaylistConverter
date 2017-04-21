@@ -27,7 +27,7 @@ function addUpdateFromPlaylistHandler() {
 function addResetPlaylistHandler() {
     $('button#reset-playlist').on('click', function (e) {
         e.preventDefault();
-        var message = 'Вы действительно хотите удалить все текущие группы и каналы?\n При этом данные из текущего плейлиста будут загружены автоматически';
+        var message = 'Вы действительно хотите удалить все текущие группы и каналы?\nПри этом данные из текущего плейлиста будут загружены автоматически.\nПользовательские каналы удалены не будут';
         if (confirm(message)) {
             $('form#reset-playlist-form').submit();
         }

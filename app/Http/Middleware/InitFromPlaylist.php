@@ -31,9 +31,13 @@ class InitFromPlaylist
         /**
          * Проверяет добавлены ли каналы и группы из плейлиста, указанного в настройках
          */
-        if (ChannelGroup::all()->isEmpty())
+        $groupWithOwnChannels = ChannelGroup::where('channels.own', 0)
+            ->join('channels', 'channel_groups.id', '=', 'channels.group_id')
+            ->get(['channel_groups.id']);
+        $ownChannels = DBChannel::where('own', 0)->get();
+        if (ChannelGroup::all()->isEmpty() || count($groupWithOwnChannels) === 0)
             PlaylistController::updateGroupsFromPlaylist();
-        if (DBChannel::all()->isEmpty())
+        if (DBChannel::all()->isEmpty() || count($ownChannels) === 0)
             PlaylistController::updateChannelsFromPlaylist();
 
         return $next($request);

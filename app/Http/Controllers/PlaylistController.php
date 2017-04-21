@@ -103,9 +103,19 @@ class PlaylistController extends Controller
      */
     public static function resetPlaylist()
     {
+        $groupsIdWithOwnChannels = [];
+        $channels = DBChannel::all();
+        foreach ($channels as $channel) {
+            if ($channel->own !== 1)
+                DBChannel::destroy($channel->id);
+            else
+                $groupsIdWithOwnChannels[] = $channel->group_id;
+        }
+        $groupsIdWithOwnChannels = array_unique($groupsIdWithOwnChannels);
         $groups = ChannelGroup::all();
         foreach ($groups as $group) {
-            ChannelGroup::destroy($group->id);
+            if (!in_array($group->id, $groupsIdWithOwnChannels))
+                ChannelGroup::destroy($group->id);
         }
         return redirect()->route('channels')->with('status', 'Плейлист успешно очищен');
     }
