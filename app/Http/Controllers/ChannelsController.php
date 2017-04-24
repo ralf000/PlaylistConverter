@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Channel;
 use App\DBChannel;
 use App\ChannelGroup;
 use App\Playlist;

@@ -10,6 +10,10 @@ use App\Helpers\MbString;
 
 class Playlist extends AFile implements ICreating
 {
+
+    const EXTINF = '#EXTINF';
+    const EXTGRP = '#EXTGRP';
+    const URL_SCHEME = 'http';
     /**
      * @var Channel
      */
@@ -21,22 +25,12 @@ class Playlist extends AFile implements ICreating
     private $channels = [];
 
     /**
-     * @var Config
-     */
-//    private $config;
-    /**
-     * @var int Общее количество каналов
-     */
-    private $channelCounter = 0;
-
-    /**
      * Playlist constructor.
      */
     public function __construct()
     {
         $path = config('main.inputPlaylist.value');
         parent::__construct($path);
-//        $this->config = App::get('config');
     }
 
     /**
@@ -58,11 +52,12 @@ class Playlist extends AFile implements ICreating
         $descriptor = @fopen($url, 'r');
         if (!$descriptor)
             return false;
-        
+
         while (!feof($descriptor)) {
             $line = MbString::mb_trim(fgets($descriptor));
             if (empty($line)) continue;
-            return ($line == '#EXTM3U');
+            if (mb_substr($line, 0, 7) == '#EXTM3U' || mb_substr($line, 0, 7) == '#EXTINF')
+                return true;
         }
         return false;
     }
@@ -90,21 +85,28 @@ class Playlist extends AFile implements ICreating
      */
     private function setChannelsFromPlaylist()
     {
+        $skipNextTitle = false; //пропустить следующую строку
         while (!feof($this->descriptor)) {
             $line = MbString::mb_trim(fgets($this->descriptor));
-            if (empty($line) || $line == '#EXTM3U')
+            if (empty($line) || mb_substr($line, 0, 7) == '#EXTM3U')
                 continue;
-            if (mb_substr($line, 0, 7) == '#EXTINF') {
-                $channelData = [];
-                //example: #EXTINF:0,РБК-ТВ
-                list(, $channelData['title']) = explode(',', $line);
-                $this->channelCounter++;
-            } else if (mb_substr($line, 0, 7) == '#EXTGRP') {
-                //example: #EXTGRP:новости
-                list(, $channelData['group']) = explode(':', $line);
-            } else if (mb_substr($line, 0, 4) == 'http') {
-                $channelData['url'] = $line;
-                $this->channels[] = new Channel($channelData);
+            if (mb_strpos($line, 'tvg-logo') !== false) {
+                $skipNextTitle = true;
+                continue;
+            }
+            if ($skipNextTitle){
+                $skipNextTitle = false;
+                continue;
+            }
+
+            $channel = new Channel();
+            if (mb_substr($line, 0, 7) == self::EXTINF) {
+                $channel->EXTINFConverter($line);
+            } else if (mb_substr($line, 0, 7) == self::EXTGRP) {
+                $channel->EXTGRPConverter($line);
+            } else if (mb_substr($line, 0, 4) == self::URL_SCHEME) {
+                $channel->setUrl($line);
+                $this->channels[] = $channel;
             }
         }
         $this->close($this->descriptor);
