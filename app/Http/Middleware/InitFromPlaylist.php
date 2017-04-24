@@ -3,9 +3,11 @@
 namespace App\Http\Middleware;
 
 use App\ChannelGroup;
+use App\Config;
 use App\DBChannel;
 use App\Http\Controllers\ChannelGroupController;
 use App\Http\Controllers\ChannelsController;
+use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\PlaylistController;
 use App\Playlist;
 use Closure;
@@ -22,9 +24,25 @@ class InitFromPlaylist
      */
     public function handle($request, Closure $next)
     {
+        $this->initConfig();
         if ($this->checkPlaylistLink($request) === true) {
             $this->updateDataFromPlaylist();
             return $next($request);
+        }
+    }
+
+    private function initConfig()
+    {
+        $configFields = Config::getConfigFields();
+        if (count(Config::all()) < count($configFields)) {
+            foreach ($configFields as $configField) {
+                $row = Config::where('name', $configField)->get();
+                if (count($row) !== 0) continue;
+
+                $config = new Config();
+                $config->fill(['name' => $configField]);
+                $config->save();
+            }
         }
     }
 

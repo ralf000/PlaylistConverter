@@ -2,61 +2,31 @@
 
 namespace App;
 
-use Infinety\Config\Rewrite;
+use Illuminate\Database\Eloquent\Model;
 
-class Config
+class Config extends Model
 {
-    /**
-     * @var string имя используемого файла конфига
-     */
-    private $configName = 'main';
+    protected $table = 'config';
 
-    /**
-     * @var array данные класса
-     */
-    private $data = [];
+    protected $fillable = ['name', 'value'];
 
-    /**
-     * @return array
-     */
-    public function all() : array
-    {
-        return config($this->configName);
-    }
+    public $timestamps = false;
 
-    /**
-     * @param array $data
-     * @throws \Exception
-     */
-    public function update(array $data)
-    {
-        $this->fill($data);
-        $data = $this->prepareToSave();
-        $mainConfig = new Rewrite();
-        $mainConfig->toFile(config_path() . '/main.php', $data);
-    }
-
-    /**
-     * @param array $data
-     */
-    private function fill(array $data)
-    {
-        $this->data = $data;
-    }
+    private $configFields = [
+        'builderMode',
+        'inputPlaylist',
+        'outputPlaylistName',
+        'inputTVProgram',
+        'inputReserveTVProgram',
+        'outputTVProgramName'
+    ];
 
     /**
      * @return array
-     * @throws \Exception
      */
-    private function prepareToSave() : array
+    public static function getConfigFields() : array
     {
-        if (!$this->data || !is_array($this->data))
-            throw new \Exception('Данные для сохранения отсутствуют или не являются массивом');
-
-        $output = [];
-        foreach ($this->data as $key => $item) {
-            $output[$key . '.value'] = $item;
-        }
-        return $output;
+        return (new self)->configFields;
     }
+    
 }

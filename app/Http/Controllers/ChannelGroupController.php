@@ -63,8 +63,9 @@ class ChannelGroupController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
+     * 
+     * @param Request $request
+     * @return $this
      */
     public function update(Request $request)
     {
