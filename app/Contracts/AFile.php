@@ -29,8 +29,7 @@ abstract class AFile
         if (!is_null($this->descriptor))
             return null;
 
-        $this->descriptor = fopen($path, 'r');
-        if (!$this->descriptor)
+        if (!$this->descriptor = fopen($path, 'r'))
             throw new FileNotFoundException('Не удалось открыть файл');
         $this->path = $path;
     }

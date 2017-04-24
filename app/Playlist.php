@@ -36,7 +36,6 @@ class Playlist extends AFile implements ICreating
     {
         $path = config('main.inputPlaylist.value');
         parent::__construct($path);
-        $this->setChannelsFromPlaylist();
 //        $this->config = App::get('config');
     }
 
@@ -50,12 +49,32 @@ class Playlist extends AFile implements ICreating
     }
 
     /**
+     * Проверяет корректность плейлиста
+     * @param string $url ссылка на плейлист
+     * @return bool
+     */
+    public static function inputPlaylistIsCorrect($url) : bool
+    {
+        $descriptor = @fopen($url, 'r');
+        if (!$descriptor)
+            return false;
+        
+        while (!feof($descriptor)) {
+            $line = MbString::mb_trim(fgets($descriptor));
+            if (empty($line)) continue;
+            return ($line == '#EXTM3U');
+        }
+        return false;
+    }
+
+    /**
      * Возвращает группы из плейлиста
      *
      * @return array
      */
     public function getGroupsFromPlaylist()
     {
+        $this->setChannelsFromPlaylist();
         $groups = [];
         /**
          * @var Channel $channel
@@ -213,6 +232,7 @@ class Playlist extends AFile implements ICreating
      */
     public function getChannels() : array
     {
+        $this->setChannelsFromPlaylist();
         return $this->channels;
     }
 

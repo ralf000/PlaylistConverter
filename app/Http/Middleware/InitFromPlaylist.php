@@ -7,7 +7,9 @@ use App\DBChannel;
 use App\Http\Controllers\ChannelGroupController;
 use App\Http\Controllers\ChannelsController;
 use App\Http\Controllers\PlaylistController;
+use App\Playlist;
 use Closure;
+use Illuminate\Http\RedirectResponse;
 
 class InitFromPlaylist
 {
@@ -20,17 +22,40 @@ class InitFromPlaylist
      */
     public function handle($request, Closure $next)
     {
-        /**
-         * Проверяет добавлена ли ссылка на плейлист
-         */
-        if (!config('main.inputPlaylist.value') && !$request->inputPlaylist) {
-            session()->flash('info', 'Пожалуйста заполните все поля в настройках');
-            if (\Route::currentRouteName() !== 'config')
-                return redirect()->route('config');
+        if ($this->checkPlaylistLink($request) === true) {
+            $this->updateDataFromPlaylist();
+            return $next($request);
         }
-        /**
-         * Проверяет добавлены ли каналы и группы из плейлиста, указанного в настройках
-         */
+    }
+
+    /**
+     * Проверяет добавлена ли ссылка на плейлист
+     * @param $request
+     * @return bool|RedirectResponse
+     */
+    private function checkPlaylistLink($request)
+    {
+        if (!config('main.inputPlaylist.value') && !$request->inputPlaylist) {
+            return $this->redirectToConfig('Пожалуйста заполните все поля в настройках');
+        }
+
+        if (session('inputPlaylistIsCorrect') === true)
+            return true;
+
+        if (!Playlist::inputPlaylistIsCorrect(config('main.inputPlaylist.value'))) {
+            return $this->redirectToConfig('Неверная ссылка на плейлист. Измените ссылку в настройках, чтобы продолжить работу');
+        } else {
+            session(['inputPlaylistIsCorrect' => true]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Проверяет добавлены ли каналы и группы из плейлиста, указанного в настройках
+     */
+    private function updateDataFromPlaylist()
+    {
         $groupWithOwnChannels = ChannelGroup::where('channels.own', 0)
             ->join('channels', 'channel_groups.id', '=', 'channels.group_id')
             ->get(['channel_groups.id']);
@@ -39,7 +64,18 @@ class InitFromPlaylist
             PlaylistController::updateGroupsFromPlaylist();
         if (DBChannel::all()->isEmpty() || count($ownChannels) === 0)
             PlaylistController::updateChannelsFromPlaylist();
+    }
 
-        return $next($request);
+    /**
+     * Перенаправляет в раздел настроек сайта
+     *
+     * @param $message
+     * @return RedirectResponse
+     */
+    private function redirectToConfig($message)
+    {
+        session()->flash('info', $message);
+        if (\Route::currentRouteName() !== 'config')
+            return redirect()->route('config');
     }
 }

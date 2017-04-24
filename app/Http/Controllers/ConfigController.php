@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Config;
+use App\Playlist;
 use Illuminate\Http\Request;
 
 class ConfigController extends Controller
@@ -38,6 +39,11 @@ class ConfigController extends Controller
         ]);
         if ($validator->fails()) {
             return redirect()->route('config')->withInput($input)->withErrors($validator);
+        }
+
+        if (!Playlist::inputPlaylistIsCorrect($input['inputPlaylist'])) {
+            session()->flash('info', 'Неверная ссылка на плейлист');
+            return redirect()->route('config');
         }
 
         $config->update($input);
