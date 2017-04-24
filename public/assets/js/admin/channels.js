@@ -1,4 +1,3 @@
-
 function sendChangeChannelVisibilityAjax(el) {
     $.ajax({
         method: 'post',
@@ -53,14 +52,11 @@ function addResetChannelHandler() {
     });
 }
 
-function addHandlersForChannels() {
-
-    addDeleteChannelHandler();
-    addResetChannelHandler();
-    addSortingChannels();
-
-    //скрыть/показать группу в списке групп
-    $('button.change-channel-visibility-btn').on('click', function (e) {
+/**
+ * скрыть/показать канал в списке каналов
+ */
+function addChangeVisibilityChannelsHandler() {
+    $('.change-channel-visibility-btn').on('click', function (e) {
         e.preventDefault();
         var btn = $(this);
         var tdUrl = btn.closest('tr').find('td.td-url');
@@ -113,7 +109,13 @@ function addHandlersForChannels() {
             }
         }
     });
+}
 
+function addHandlersForChannels() {
+    addDeleteChannelHandler();
+    addResetChannelHandler();
+    addSortingChannels();
+    addChangeVisibilityChannelsHandler();
 }
 
 $(function () {

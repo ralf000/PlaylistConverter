@@ -29,7 +29,7 @@ class Playlist extends AFile implements ICreating
      */
     public function __construct()
     {
-        $path = config('main.inputPlaylist.value');
+        $path = Config::get('inputPlaylist');
         parent::__construct($path);
     }
 
@@ -47,7 +47,7 @@ class Playlist extends AFile implements ICreating
      * @param string $url ссылка на плейлист
      * @return bool
      */
-    public static function inputPlaylistIsCorrect($url) : bool
+    public static function inputPlaylistIsCorrect(string $url) : bool
     {
         $descriptor = @fopen($url, 'r');
         if (!$descriptor)

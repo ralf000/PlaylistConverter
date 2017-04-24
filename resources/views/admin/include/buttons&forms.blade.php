@@ -8,12 +8,14 @@
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#add-group">
         Добавить группу
     </button>
-    <button type="button" class="btn btn-default pull-right" id="reset-playlist">
-        Сбросить все данные из плейлиста
-    </button>
-    <button type="button" class="btn btn-default pull-right" id="update-from-playlist">
-        Синхронизировать с плейлистом
-    </button>
+    @if (!\App\Config::get('builderMode'))
+        <button type="button" class="btn btn-default pull-right" id="reset-playlist">
+            Сбросить все данные из плейлиста
+        </button>
+        <button type="button" class="btn btn-default pull-right" id="update-from-playlist">
+            Синхронизировать с плейлистом
+        </button>
+    @endif
 </div>
 
 {{--Форма для удаления канала--}}

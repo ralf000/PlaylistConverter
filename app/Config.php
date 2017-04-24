@@ -28,5 +28,10 @@ class Config extends Model
     {
         return (new self)->configFields;
     }
+
+    public static function get(string $name) : string
+    {
+        return self::where('name', $name)->first()['value'];
+    }
     
 }

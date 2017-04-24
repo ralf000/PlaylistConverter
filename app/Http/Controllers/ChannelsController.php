@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Channel;
 use App\DBChannel;
 use App\ChannelGroup;
-use App\Playlist;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ChannelsController extends Controller
 {

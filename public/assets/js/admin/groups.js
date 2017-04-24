@@ -42,15 +42,13 @@ function addResetGroupHandler() {
     });
 }
 
-function addHandlersForGroups() {
-
-    addDeleteGroupHandler();
-    addResetGroupHandler();
-    addSortingGroups();
-
-    //скрыть/показать группу в списке групп
-    $('button.change-group-visibility-btn').on('click', function (e) {
+/**
+ * скрыть/показать группу в списке групп
+ */
+function addChangeVisibilityGroupHandler() {
+    $('.change-group-visibility-btn').on('click', function (e) {
         e.preventDefault();
+        console.log(1);
         var btn = $(this);
         sendChangeGroupVisibilityAjax($(this));
         if (btn.hasClass('group-hide-btn')) {
@@ -87,6 +85,13 @@ function addHandlersForGroups() {
                 .val(0);
         }
     });
+}
+
+function addHandlersForGroups() {
+    addDeleteGroupHandler();
+    addResetGroupHandler();
+    addSortingGroups();
+    addChangeVisibilityGroupHandler();
 }
 
 $(function () {

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\ChannelGroup;
 use App\DBChannel;
-use App\Playlist;
 use Illuminate\Http\Request;
 
 class ChannelGroupController extends Controller

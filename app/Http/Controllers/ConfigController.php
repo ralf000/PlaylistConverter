@@ -43,7 +43,7 @@ class ConfigController extends Controller
         }
 
         if (!isset($input['inputPlaylist']))
-            $input['inputPlaylist'] = config('main.inputPlaylist.value');
+            $input['inputPlaylist'] = Config::get('inputPlaylist');
 
         if (!$input['builderMode'] && !Playlist::inputPlaylistIsCorrect($input['inputPlaylist'])) {
             session()->flash('info', 'Неверная ссылка на плейлист');

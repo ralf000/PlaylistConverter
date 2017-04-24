@@ -25,6 +25,10 @@ class InitFromPlaylist
     public function handle($request, Closure $next)
     {
         $this->initConfig();
+        
+        if (Config::get('builderMode'))
+            return $next($request);
+
         if ($this->checkPlaylistLink($request) === true) {
             $this->updateDataFromPlaylist();
             return $next($request);
@@ -36,8 +40,8 @@ class InitFromPlaylist
         $configFields = Config::getConfigFields();
         if (count(Config::all()) < count($configFields)) {
             foreach ($configFields as $configField) {
-                $row = Config::where('name', $configField)->get();
-                if (count($row) !== 0) continue;
+                $row = Config::get($configField);
+                if ($row) continue;
 
                 $config = new Config();
                 $config->fill(['name' => $configField]);
@@ -53,14 +57,14 @@ class InitFromPlaylist
      */
     private function checkPlaylistLink($request)
     {
-        if (!config('main.inputPlaylist.value') && !$request->inputPlaylist) {
+        if (empty(Config::get('inputPlaylist')) && !$request->inputPlaylist) {
             return $this->redirectToConfig('Пожалуйста заполните все поля в настройках');
         }
 
         if (session('inputPlaylistIsCorrect') === true)
             return true;
 
-        if (!Playlist::inputPlaylistIsCorrect(config('main.inputPlaylist.value'))) {
+        if (!Playlist::inputPlaylistIsCorrect(Config::get('inputPlaylist'))) {
             return $this->redirectToConfig('Неверная ссылка на плейлист. Измените ссылку в настройках, чтобы продолжить работу');
         } else {
             session(['inputPlaylistIsCorrect' => true]);
