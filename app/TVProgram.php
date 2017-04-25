@@ -28,10 +28,10 @@ class TVProgram extends AFile implements ICreating
      */
     public function __construct()
     {
-        $this->path = config('main.inputTVProgram');
+        $this->path = Config::get('inputTVProgram');
         parent::__construct($this->path);
-        $this->outputTVName = config('main.outputTVProgramName');
-        $this->outputTVPath = __DIR__ . '/../../' . $this->outputTVName;
+        $this->outputTVName = Config::get('outputTVProgramName');
+        $this->outputTVPath = public_path() . DIRECTORY_SEPARATOR . $this->outputTVName;
         $this->outputTVGzPath = $this->outputTVPath . '.gz';
     }
 
@@ -71,7 +71,7 @@ class TVProgram extends AFile implements ICreating
              */
             $xmlChannels[] = MbString::mb_trim((string)$item->{'display-name'});
         }
-        $playlistChannels = $this->getPlaylistChannels();
+        $playlistChannels = (new Playlist())->getChannels();
         $withoutProgram = [];
         foreach ($playlistChannels as $playlistChannel) {
             /**
@@ -127,7 +127,7 @@ class TVProgram extends AFile implements ICreating
      */
     private function getReserveTvProgramPath() : string
     {
-        return $this->path = config('main.inputReserveTVProgram');
+        return $this->path = Config::get('inputReserveTVProgram');
     }
 
     /**
@@ -165,15 +165,5 @@ class TVProgram extends AFile implements ICreating
         $this->close($tvInput);
         $this->close($tvOutput);
         return true;
-    }
-
-    /**
-     * @return array
-     */
-    private function getPlaylistChannels() : array
-    {
-        $playlist = new Playlist();
-        $playlist->create();
-        return $playlist->getChannels();
     }
 }

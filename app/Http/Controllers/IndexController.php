@@ -11,7 +11,7 @@ class IndexController extends Controller
     {
         $playlist = new Playlist();
         $playlist->create();
-/*        $tvProgram = new TVProgram();
-        $tvProgram->create();*/
+        $tvProgram = new TVProgram();
+        $tvProgram->create();
     }
 }
