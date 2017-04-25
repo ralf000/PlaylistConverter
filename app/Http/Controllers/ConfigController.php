@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Config;
 use App\Playlist;
+use App\TVProgram;
 use Illuminate\Http\Request;
 
 class ConfigController extends Controller
