@@ -13,19 +13,6 @@ class ChannelGroupController extends Controller
      */
     const NONAMEGROUP = 'Без группы';
 
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index()
-    {
-        $groups = ChannelGroup::all()->sortBy('sort')->toArray();
-        $title = 'Группы каналов';
-        return view('admin.groups', compact('title', 'groups'));
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -92,7 +79,6 @@ class ChannelGroupController extends Controller
             $group->fill($groupData);
             $group->update();
         }
-//        return redirect()->route('groups')->with('status', 'Изменения успешно сохранены');
     }
 
     /**
@@ -105,7 +91,6 @@ class ChannelGroupController extends Controller
     public function destroy(Request $request)
     {
         $group = ChannelGroup::find((int)$request->id);
-        //если группа добавлена пользователем (own === 1) и передан верный id
         if ($group) {
             $this->changeGroupForDeleteChannels($group->id);
 

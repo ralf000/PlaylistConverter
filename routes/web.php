@@ -65,11 +65,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
      */
     Route::group(['prefix' => 'groups'], function () {
 
-        Route::get('/', [
-            'uses' => 'ChannelGroupController@index',
-            'as' => 'groups'
-        ]);
-
         Route::put('/', [
             'uses' => 'ChannelGroupController@store',
             'as' => 'groups-store'
