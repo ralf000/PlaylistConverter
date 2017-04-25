@@ -17,7 +17,6 @@
     <input type="hidden" name="channel[{{$channel['id']}}][disabled]" class="disable-tag"
            value="{{ $channel['hidden'] }}">
     <td><span class="btn btn-default glyphicon glyphicon-move sorting-btn" title="Сортировать"></span></td>
-    {{--<td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>{{$channel['original_name']}}</td>--}}
     <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>
         <input name="channel[{{$channel['id']}}][new_name]"
                type="text" class="form-control new-name"

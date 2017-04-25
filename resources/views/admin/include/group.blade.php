@@ -35,15 +35,15 @@
                         type="button">Скрыть</button>
             @else
                 <a data-id="{{$group['id']}}"
-                        data-token="{{ csrf_token() }}"
-                        class="change-group-visibility-btn group-show-btn btn btn-default"
-                        type="button">Показать</a>
+                   data-token="{{ csrf_token() }}"
+                   class="change-group-visibility-btn group-show-btn btn btn-default"
+                   type="button">Показать</a>
             @endif
             <button class="group-reset-btn btn btn-default"
                     title="Сбросить изменения">
                 <span class="glyphicon glyphicon-share-alt"></span>
             </button>
-            @if ($group['own'])
+            @if ($group['own'] || in_array($group['new_name'], $emptyGroups))
                 <button data-id="{{$group['id']}}"
                         data-name="{{$group['new_name']}}"
                         class="group-delete-btn btn btn-default"

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Channel;
 use App\ChannelGroup;
+use App\Config;
 use App\DBChannel;
 use App\Playlist;
 use Illuminate\Http\Request;
@@ -16,6 +17,10 @@ class PlaylistController extends Controller
      */
     public static function syncWithPlaylist()
     {
+        if (Config::get('builderMode')){
+            return redirect()->back()
+                ->with('info', 'Для данной операции необходимо убрать галочку "создать плейлист в нуля" в настроках');
+        }
         self::updateGroupsFromPlaylist();
         self::updateChannelsFromPlaylist();
 

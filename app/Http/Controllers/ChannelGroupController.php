@@ -106,7 +106,7 @@ class ChannelGroupController extends Controller
     {
         $group = ChannelGroup::find((int)$request->id);
         //если группа добавлена пользователем (own === 1) и передан верный id
-        if ($group && $group->own) {
+        if ($group) {
             $this->changeGroupForDeleteChannels($group->id);
 
             if ($this->emptyNonameGroup())

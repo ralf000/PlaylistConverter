@@ -15,11 +15,12 @@ class ChannelsController extends Controller
      */
     public function index()
     {
-        $title = 'Каналы';
+        $title = 'Плейлист';
         $channels = DBChannel::all()->sortBy('sort')->toArray();
         $groups = ChannelGroup::all()->sortBy('sort')->toArray();
+        $emptyGroups = $this->getEmptyGroups();
 
-        return view('admin.channels', compact('title', 'groups', 'channels'));
+        return view('admin.channels', compact('title', 'groups', 'channels', 'emptyGroups'));
     }
 
     /**
@@ -105,7 +106,7 @@ class ChannelsController extends Controller
 
             if ($channel->original_name !== $channelData['original_name']
                 || $channel->original_url !== $channelData['original_url']
-                || (int) $channel->original_group_id !== (int) $channelData['original_group_id']
+                || (int)$channel->original_group_id !== (int)$channelData['original_group_id']
             ) {
                 throw new \Exception('Переданы неверные данные для канала ' . $channel->new_name);
             }
@@ -161,6 +162,21 @@ class ChannelsController extends Controller
         $channelGroupController = new ChannelGroupController();
         if ($channelGroupController->emptyNonameGroup())
             $channelGroupController->destroyNonameGroup();
+    }
+
+    /**
+     * Возвращает список пустых групп без каналов
+     *
+     * @return array
+     */
+    private function getEmptyGroups() : array
+    {
+        $emptyGroups = ChannelGroup::select('channel_groups.new_name')->whereNull('channels.group_id')->leftJoin('channels', 'channel_groups.id', '=', 'channels.group_id')->get();
+        $output = [];
+        foreach ($emptyGroups as $emptyGroup) {
+            $output[] = $emptyGroup->new_name;
+        }
+        return $output;
     }
 
 }

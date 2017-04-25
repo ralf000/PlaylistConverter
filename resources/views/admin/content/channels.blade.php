@@ -9,7 +9,7 @@
 
     <div class="panel-body">
         <div class="col-md-12">
-            @if(!empty($channels) && is_array($channels))
+            @if(!empty($groups) && is_array($groups))
                 <form class="form-horizontal" role="form" action="{{ route('channels-update') }}" method="post"
                       id="channels-form">
                     {{ csrf_field() }}
@@ -21,7 +21,7 @@
                 </form>
 
             @else
-                <p>Каналы пока не добавлены</p>
+                <p>Плейлист пока пуст</p>
             @endif
         </div>
     </div>
