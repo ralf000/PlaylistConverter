@@ -86,6 +86,7 @@ class Playlist extends AFile implements ICreating
     private function setChannelsFromPlaylist()
     {
         $skipNextTitle = false; //пропустить следующую строку
+        $channel = new Channel(); //инициализация канала
         while (!feof($this->descriptor)) {
             $line = MbString::mb_trim(fgets($this->descriptor));
             if (empty($line) || mb_substr($line, 0, 7) == '#EXTM3U')
@@ -94,12 +95,11 @@ class Playlist extends AFile implements ICreating
                 $skipNextTitle = true;
                 continue;
             }
-            if ($skipNextTitle){
+            if ($skipNextTitle) {
                 $skipNextTitle = false;
                 continue;
             }
 
-            $channel = new Channel();
             if (mb_substr($line, 0, 7) == self::EXTINF) {
                 $channel->EXTINFConverter($line);
             } else if (mb_substr($line, 0, 7) == self::EXTGRP) {
@@ -107,6 +107,7 @@ class Playlist extends AFile implements ICreating
             } else if (mb_substr($line, 0, 4) == self::URL_SCHEME) {
                 $channel->setUrl($line);
                 $this->channels[] = $channel;
+                $channel = new Channel();
             }
         }
         $this->close($this->descriptor);

@@ -65,7 +65,7 @@ class Channel
      * @param string $EXTINF
      * @return string
      */
-    public function EXTINFConverter(string $EXTINF) : string
+    public function EXTINFConverter(string $EXTINF)
     {
         $EXTINFchunks = explode(',', $EXTINF);
         if (!$EXTINFchunks) return false;
@@ -76,8 +76,7 @@ class Channel
         if (preg_match('~group-title="(.*)"~Uui', $EXTINF, $groupString)) {
             $this->group = $groupString[1];
         }
-
-        return $this->title = $title;
+        $this->title = $title;
     }
 
     /**
@@ -115,7 +114,7 @@ class Channel
      */
     public function getTitle()
     {
-        return $this->channel['title'];
+        return $this->title;
     }
 
     /**
@@ -123,7 +122,7 @@ class Channel
      */
     public function getGroup()
     {
-        return $this->channel['group'];
+        return $this->group;
     }
 
     /**
@@ -131,7 +130,7 @@ class Channel
      */
     public function getUrl()
     {
-        return $this->channel['url'];
+        return $this->url;
     }
 
     /**
@@ -139,7 +138,7 @@ class Channel
      */
     public function setTitle($title)
     {
-        $this->channel['title'] = $title;
+        $this->title = $title;
     }
 
     /**
@@ -147,7 +146,7 @@ class Channel
      */
     public function setGroup($group)
     {
-        $this->channel['group'] = $group;
+        $this->group = $group;
     }
 
 
