@@ -7,11 +7,11 @@ use App\TVProgram;
 
 class IndexController extends Controller
 {
-    public function index()
+    public static function run()
     {
         $playlist = new Playlist();
         $playlist->create();
-        $tvProgram = new TVProgram();
-        $tvProgram->create();
+/*        $tvProgram = new TVProgram();
+        $tvProgram->create();*/
     }
 }

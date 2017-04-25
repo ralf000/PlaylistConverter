@@ -8,11 +8,6 @@ use App\Helpers\MbString;
 class Channel
 {
     /**
-     * @var array [title => 'title', group => 'group', url => 'url']
-     */
-    private $channel = [];
-
-    /**
      * @var string название канала
      */
     private $title = '';
@@ -25,19 +20,17 @@ class Channel
      */
     private $url = '';
     /**
+     * @var int позиция канала в списке каналов
+     */
+    private $position = 0;
+    /**
+     * @var int позиция группы в списке групп
+     */
+    private $groupPosition = 0;
+    /**
      * @var string Шаблон для создания плейлиста
      */
     private $template = '#EXTINF:0 group-title="{group}",{title}' . PHP_EOL . '{url}' . PHP_EOL;
-
-    /**
-     * DBChannel constructor.
-     * @param array $channel
-     * [title => 'title', group => 'group', url => 'url']
-     */
-    public function __construct(array $channel = [])
-    {
-        $this->channel = $channel;
-    }
 
     /**
      * Конвертирует канал для создания плейлиста
@@ -46,9 +39,9 @@ class Channel
     public function convert() : string
     {
         return strtr($this->template, [
-            '{group}' => MbString::mb_ucfirst($this->channel['group']),
-            '{title}' => $this->channel['title'],
-            '{url}' => $this->channel['url'],
+            '{group}' => MbString::mb_ucfirst($this->group),
+            '{title}' => $this->title,
+            '{url}' => $this->url,
         ]);
     }
 
@@ -96,17 +89,50 @@ class Channel
         return $this->group = $group;
     }
 
+    public function fill(DBChannel $dbChannel)
+    {
+        $this->title = $dbChannel->new_name;
+        $this->group = $dbChannel->group->new_name;
+        $this->url = $dbChannel->new_url;
+        $this->position = $dbChannel->sort;
+        $this->groupPosition = $dbChannel->group->sort;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @param string $group
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
+    }
+
     /**
      * Получает ссылку на канал
      * Examples:
      * http://185.10.211.10:7071/play/a08u?auth=PredvTest:PredvTestFDFF465DFF
-     * 
+     *
      * @param string $url
      * @return string
      */
     public function setUrl(string $url) : string
     {
         return $this->url = $url;
+    }
+
+    /**
+     * @param int $groupPosition
+     */
+    public function setGroupPosition($groupPosition)
+    {
+        $this->groupPosition = $groupPosition;
     }
 
     /**
@@ -134,20 +160,27 @@ class Channel
     }
 
     /**
-     * @param string $title
+     * @return int
      */
-    public function setTitle($title)
+    public function getPosition()
     {
-        $this->title = $title;
+        return $this->position;
     }
 
     /**
-     * @param string $group
+     * @param int $position
      */
-    public function setGroup($group)
+    public function setPosition($position)
     {
-        $this->group = $group;
+        $this->position = $position;
     }
 
+    /**
+     * @return int
+     */
+    public function getGroupPosition()
+    {
+        return $this->groupPosition;
+    }
 
 }

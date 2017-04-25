@@ -14,13 +14,9 @@ class Playlist extends AFile implements ICreating
     const EXTINF = '#EXTINF';
     const EXTGRP = '#EXTGRP';
     const URL_SCHEME = 'http';
-    /**
-     * @var Channel
-     */
-    private $channel;
 
     /**
-     * @var array массив обработанных каналов типа Channel
+     * @var array массив необработанных каналов типа Channel
      */
     private $channels = [];
 
@@ -38,6 +34,7 @@ class Playlist extends AFile implements ICreating
      */
     public function create()
     {
+        $this->setChannelsFromPlaylist();
         $this->handleChannels();
         $this->writeDataToPlaylist();
     }
@@ -81,6 +78,17 @@ class Playlist extends AFile implements ICreating
     }
 
     /**
+     * Вовзращает полный путь до выходного плейлиста
+     *
+     * @return string
+     */
+    public static function getPath()
+    {
+        $playlistName = Config::get('outputPlaylistName');
+        return public_path() . DIRECTORY_SEPARATOR . $playlistName;
+    }
+
+    /**
      * Парсит телеканалы из плейлиста
      */
     private function setChannelsFromPlaylist()
@@ -115,17 +123,17 @@ class Playlist extends AFile implements ICreating
 
     private function handleChannels()
     {
-        $this->channels = [];
-        foreach ($this->channels as $channel) {
-            $this->channel = $channel;
-            $this->changeChannelAttribute();
-            if ($this->filterChannel()) {
-                $this->channels[] = $this->channel;
-            }
+        foreach ($this->channels as $key => $channel) {
+            /**
+             * @var Channel $channel
+             */
+            $dbChannel = DBChannel::where('new_url', $channel->getUrl())->first();
+            if ($dbChannel->group->hidden) unset($this->channels[$key]);
+            if ($dbChannel->hidden) unset($this->channels[$key]);
+            $channel->fill($dbChannel);
         }
-        $this->addAdditionalChannels();
-        $this->sortChannels();
-        $this->sortGroups();
+        $this->addOwnChannels();
+        $this->sort();
     }
 
     /**
@@ -133,8 +141,7 @@ class Playlist extends AFile implements ICreating
      */
     private function writeDataToPlaylist()
     {
-        $playlistName = config('main.outputPlaylistName');
-        $playlistPath = __DIR__ . '/../../' . $playlistName;
+        $playlistPath = self::getPath();
         $descriptor = fopen($playlistPath, 'w');
         fwrite($descriptor, '#EXTM3U' . PHP_EOL);
         foreach ($this->channels as $channel) {
@@ -144,90 +151,43 @@ class Playlist extends AFile implements ICreating
             fwrite($descriptor, $channel->convert());
         }
         $this->close($descriptor);
-        App::get('logger')->successCreatePlaylistLog($this->channelCounter, count($this->channels));
-    }
-
-    /**
-     * Переименовывает каналы и меняет их группы
-     */
-    private function changeChannelAttribute()
-    {
-        $title = $this->channel->getTitle();
-//        $renameChannels = $this->config->get('renameChannels');
-        $renameChannels = RenamedChannel::all()->toArray();
-        if (array_key_exists($title, $renameChannels))
-            $this->channel->setTitle($renameChannels[$title]);
-//        $changeGroups = ArrayHelper::arrayValuesChangeCase($this->config->get('changeGroups'));
-        $changeGroups = ArrayHelper::arrayValuesChangeCase(ChangedGroupChannel::all()->toArray());
-        if (array_key_exists($title, $changeGroups))
-            $this->channel->setGroup($changeGroups[$title]);
-    }
-
-    /**
-     * Фильтрует каналы
-     * @return bool
-     */
-    private function filterChannel() : bool
-    {
-//        $excludeChannels = $this->config->get('excludeChannels');
-        $excludeChannels = ExcludedChannel::all()->toArray();
-        if (in_array($this->channel->getTitle(), $excludeChannels))
-            return false;
-//        $excludeGroups = ArrayHelper::arrayValuesChangeCase($this->config->get('excludeGroups'));
-        $excludeGroups = ArrayHelper::arrayValuesChangeCase(ExcludedGroup::all()->toArray());
-        if (in_array($this->channel->getGroup(), $excludeGroups))
-            return false;
-        return true;
     }
 
     /**
      * Добавляет дополнительные каналы
      */
-    private function addAdditionalChannels()
+    private function addOwnChannels()
     {
-//        $additionalChannels = $this->config->get('additionalChannels');
-        $additionalChannels = AdditionalChannel::all()->toArray();
-        foreach ($additionalChannels as $additionalChannel) {
-            if (!isset($additionalChannel['group']) || empty($additionalChannel['group']))
-                $additionalChannel['group'] = 'другое';
-            $this->channels[] = new Channel($additionalChannel);
+        $additionalChannels = DBChannel::where('own', 1)->get();
+        foreach ($additionalChannels as $addChannel) {
+            if ($addChannel->group->hidden || $addChannel->hidden) continue;
+
+            $channel = new Channel();
+            $channel->fill($addChannel);
+            $this->channels[] = $channel;
         }
     }
 
     /**
-     * Сортирует каналы
-     * @param $direction
+     * Сортирует группы каналов
+     *
      * @return bool
      */
-    private function sortChannels($direction = SORT_ASC)
+    private function sort()
     {
-        return usort($this->channels, function ($a, $b) use ($direction) {
+        return usort($this->channels, function ($a, $b) {
             /**
              * @var Channel $a
              * @var Channel $b
              */
-            if ($direction === SORT_ASC)
-                return $a->getTitle() <=> $b->getTitle();
-            else
-                return $b->getTitle() <=> $a->getTitle();
-        });
-    }
-
-    private function sortGroups()
-    {
-        $output = [];
-//        foreach ($this->config->get('groupOrder') as $group) {
-        dd(SortedGroup::all()->toArray());
-        foreach (SortedGroup::all()->toArray() as $group) {
-            foreach ($this->channels as $channel) {
-                /**
-                 * @var Channel $channel
-                 */
-                if (mb_strtolower($channel->getGroup() === mb_strtolower($group)))
-                    $output[] = $channel;
+            if ($a->getGroupPosition() > $b->getGroupPosition())
+                return 1;
+            if ($a->getGroupPosition() < $b->getGroupPosition())
+                return -1;
+            if ($a->getGroupPosition() == $b->getGroupPosition()) {
+                return $a->getPosition() <=> $b->getPosition();
             }
-        }
-        $this->channels = $output;
+        });
     }
 
     /**
