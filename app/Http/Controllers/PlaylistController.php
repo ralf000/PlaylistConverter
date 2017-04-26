@@ -69,7 +69,7 @@ class PlaylistController extends Controller
         $maxSortValue = DBChannel::all('sort')->max('sort');
 
         $playlist = new Playlist();
-        $channelsFromPlaylist = $playlist->getChannels();
+        $channelsFromPlaylist = $playlist->getRawChannels();
         $groupsFromDB = ChannelGroup::all('id', 'original_name')->toArray();
         $preparedGroupsFromDB = [];
         foreach ($groupsFromDB as $groupFromDB) {

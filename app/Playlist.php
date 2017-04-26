@@ -128,6 +128,7 @@ class Playlist extends AFile implements ICreating
              * @var Channel $channel
              */
             $dbChannel = DBChannel::where('new_url', $channel->getUrl())->first();
+            if (is_null($dbChannel)) continue;
             if ($dbChannel->group->hidden) unset($this->channels[$key]);
             if ($dbChannel->hidden) unset($this->channels[$key]);
             $channel->fill($dbChannel);
@@ -191,12 +192,26 @@ class Playlist extends AFile implements ICreating
     }
 
     /**
+     * Возвращает список необработанных каналов из плейлиста
+     * 
      * @return array
      */
-    public function getChannels() : array
+    public function getRawChannels() : array
     {
         $this->setChannelsFromPlaylist();
         return $this->channels;
     }
 
+    /**
+     * Возвращает список обработанных каналов из плейлиста
+     *
+     * @return array
+     */
+    public function getHandledChannels() : array
+    {
+        $this->setChannelsFromPlaylist();
+        $this->handleChannels();
+        return $this->channels;
+    }
+    
 }

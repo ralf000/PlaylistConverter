@@ -56,7 +56,9 @@ class TVProgram extends AFile implements ICreating
 
     /**
      * Проверяет наличие телепрограммы для каналов плейлиста
+     *
      * @throws FileException
+     * @return string
      */
     public function check()
     {
@@ -71,7 +73,7 @@ class TVProgram extends AFile implements ICreating
              */
             $xmlChannels[] = MbString::mb_trim((string)$item->{'display-name'});
         }
-        $playlistChannels = (new Playlist())->getChannels();
+        $playlistChannels = (new Playlist())->getHandledChannels();
         $withoutProgram = [];
         foreach ($playlistChannels as $playlistChannel) {
             /**
@@ -82,7 +84,7 @@ class TVProgram extends AFile implements ICreating
                 $withoutProgram[] = $playlistChannelTitle;
         }
         $this->delete($this->outputTVPath);
-        echo $this->showChannelsWithoutProgram($withoutProgram);
+        return $this->showChannelsWithoutProgram($withoutProgram);
     }
 
     /**
@@ -138,14 +140,21 @@ class TVProgram extends AFile implements ICreating
     private function showChannelsWithoutProgram(array $withoutProgram) : string
     {
         if (empty($withoutProgram)) {
-            $output = '<h3>Телепрограмма доступна для всех телеканалов текущего плейлиста</h3>';
+            $output = '<p><strong>Телепрограмма доступна для всех телеканалов текущего плейлиста</strong></p>';
         } else {
-            $output = '<h3>Телепрограмма не найдена для следующих телеканалов:</h3>';
-            $output .= '<ul>';
+            $output = '<p><strong>Телепрограмма не найдена для следующих телеканалов:</strong></p>';
+            $output .= '<div class="row"><ul>';
+            $channels = [];
             foreach ($withoutProgram as $channel) {
-                $output .= '<li>' . htmlspecialchars($channel) . '</li>';
+                $channels[] = '<li>' . htmlspecialchars($channel) . '</li>';
             }
-            $output .= '</ul>';
+            if (count($channels) > 10) {
+                $chunks = array_chunk($channels, ceil(count($channels) / 3));
+                foreach ($chunks as $chunk) {
+                    $output .= '<div class="col-md-4">' . implode("\n\t", $chunk) . '</div>';
+                }
+            }
+            $output .= '</ul></div>';
         }
         return $output;
     }

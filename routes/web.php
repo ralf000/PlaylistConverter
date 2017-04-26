@@ -20,14 +20,10 @@ Route::get('/', function () {
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function () {
 
     // admin
-    Route::get('/', function () {
-        if (view()->exists('admin.index')) {
-            $data = ['title' => 'Панеля администратора'];
-            return view('admin.index', $data);
-        }
-        return view('errors.404');
-
-    });
+    Route::get('/', [
+        'uses' => 'AdminController@index',
+        'as' => 'admin'
+    ]);
 
     /**
      * Синхронизировать с плейлистом
@@ -123,6 +119,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
         Route::post('/change-channel-visibility', [
             'uses' => 'ChannelsController@changeChannelVisibility',
             'as' => 'change-channel-visibility'
+        ]);
+        
+        Route::get('/get-not-found-channels', [
+            'uses' => 'TVProgramController@getNotFoundChannels',
+            'as' => 'get-not-found-channels'
         ]);
 
     });
