@@ -6,10 +6,31 @@ namespace App;
 use App\Contracts\AFile;
 use App\Contracts\ICreating;
 use App\Helpers\ArrayHelper;
+use App\Helpers\Log;
 use App\Helpers\MbString;
 
 class Playlist extends AFile implements ICreating
 {
+    /**
+     * @var int количество каналов, полученных из плейлиста
+     */
+    private $rawChannelsNum = 0;
+    /**
+     * @var int количество каналов после обработки
+     */
+    private $handledChannelsNum = 0;
+
+    /**
+     * @var array информация о количестве каналов для логирования:
+     * $channelsInfo['raw'] int количество каналов, полученных из плейлиста
+     * $channelsInfo['handled'] int количество каналов после обработки
+     * $channelsInfo['own'] int количество каналов, добавленных пользователем
+     */
+    private $channelsInfo = [
+        'raw' => 0,
+        'handled' => 0,
+        'own' => 0
+    ];
 
     const EXTINF = '#EXTINF';
     const EXTGRP = '#EXTGRP';
@@ -118,6 +139,8 @@ class Playlist extends AFile implements ICreating
                 $channel = new Channel();
             }
         }
+        $this->channelsInfo['raw'] = count($this->channels);
+
         $this->close($this->descriptor);
     }
 
@@ -135,6 +158,8 @@ class Playlist extends AFile implements ICreating
         }
         $this->addOwnChannels();
         $this->sort();
+
+        $this->channelsInfo['handled'] = count($this->channels);
     }
 
     /**
@@ -151,6 +176,8 @@ class Playlist extends AFile implements ICreating
              */
             fwrite($descriptor, $channel->convert());
         }
+        $this->sendReport();
+        
         $this->close($descriptor);
     }
 
@@ -166,6 +193,8 @@ class Playlist extends AFile implements ICreating
             $channel = new Channel();
             $channel->fill($addChannel);
             $this->channels[] = $channel;
+
+            $this->channelsInfo['own']++;
         }
     }
 
@@ -191,9 +220,15 @@ class Playlist extends AFile implements ICreating
         });
     }
 
+    private function sendReport()
+    {
+        Log::log("Новый плейлист успешно создан. Всего каналов: {$this->channelsInfo['raw']}. 
+        После обработки: {$this->channelsInfo['handled']}. Пользовательских каналов: {$this->channelsInfo['own']}");
+    }
+
     /**
      * Возвращает список необработанных каналов из плейлиста
-     * 
+     *
      * @return array
      */
     public function getRawChannels() : array
@@ -213,5 +248,5 @@ class Playlist extends AFile implements ICreating
         $this->handleChannels();
         return $this->channels;
     }
-    
+
 }

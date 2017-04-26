@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Config;
+use App\Helpers\Log;
 use App\TVProgram;
 use Illuminate\Support\Facades\Request;
 
@@ -25,6 +27,8 @@ class TVProgramController extends Controller
             $tvProgramData = ['date' => $date, 'channels' => $channels];
             \Cache::forever('channelsWithoutTVProgram', $tvProgramData);
         }
+        Log::log('Все телеканалы просканированы на наличие телепрограммы (' . \Cache::get('currentTVProgram') . ')');
+
         return $tvProgramData;
     }
 }

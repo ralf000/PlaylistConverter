@@ -4,6 +4,7 @@ namespace App;
 
 use App\Contracts\AFile;
 use App\Contracts\ICreating;
+use App\Helpers\Log;
 use App\Helpers\MbString;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
@@ -43,9 +44,15 @@ class TVProgram extends AFile implements ICreating
         $inputTVGzData = file_get_contents($this->path);
         if (!$this->save($inputTVGzData) || !$this->checkCorrectlyDate()) {
             $inputTVGzData = file_get_contents($this->getReserveTvProgramPath());
+            Log::log('Телепрограмма  недоступна или имеет неверную дату (' . Config::get('inputTVProgram') . '). 
+            Задействована резервная телепрограмма (' . Config::get('inputReserveTVProgram') . ')');
             if (!$this->save($inputTVGzData))
                 throw new FileException('Не удалось сохранить файл телепрограммы');
+
         }
+        \Cache::forever('currentTVProgram', $this->path);
+        Log::log('Телепрограмма успешно создана (' . $this->path . ')');
+
         $this->delete($this->outputTVPath);
     }
 
@@ -64,7 +71,7 @@ class TVProgram extends AFile implements ICreating
     {
         $this->create();
         $withoutProgram = $this->getWithoutProgramChannelsList();
-        return $this->showChannelsWithoutProgram($withoutProgram);
+        return $this->getChannelsWithoutProgram($withoutProgram);
     }
 
     /**
@@ -78,7 +85,7 @@ class TVProgram extends AFile implements ICreating
         $xmlChannels = $this->getXmlChannelsList();
         $playlistChannels = (new Playlist())->getHandledChannels();
         $withoutProgram = [];
-        $foundChannel = '';
+        $foundChannel = ''; //канал - рекомендация
         foreach ($playlistChannels as $playlistChannel) {
             /**
              * @var Channel $playlistChannel
@@ -104,6 +111,9 @@ class TVProgram extends AFile implements ICreating
             }
         }
         $this->delete($this->outputTVPath);
+
+        $this->sendReport($withoutProgram);
+
         return $withoutProgram;
     }
 
@@ -195,7 +205,7 @@ class TVProgram extends AFile implements ICreating
      * @param array $withoutProgram
      * @return string
      */
-    private function showChannelsWithoutProgram(array $withoutProgram) : string
+    private function getChannelsWithoutProgram(array $withoutProgram) : string
     {
         if (empty($withoutProgram)) {
             $output = '<p><strong>Телепрограмма доступна для всех телеканалов текущего плейлиста</strong></p>';
@@ -237,5 +247,22 @@ class TVProgram extends AFile implements ICreating
         $this->close($tvInput);
         $this->close($tvOutput);
         return true;
+    }
+
+    /**
+     * Посылает рапорт о проверке телепрограммы
+     *
+     * @param array $withoutProgramChannels каналы без телепрограммы
+     */
+    private function sendReport(array $withoutProgramChannels)
+    {
+        $numChannelsWithRecommendationsNum = 0;
+        foreach ($withoutProgramChannels as $withoutProgramChannel) {
+            if ($withoutProgramChannel['recommendedTitle'])
+                $numChannelsWithRecommendationsNum++;
+        }
+        Log::log('Телепрограмма успешно проверена. 
+        Для ' . count($withoutProgramChannels) . ' каналов не найдено телепрограммы. 
+        Для ' . $numChannelsWithRecommendationsNum . 'каналов подготовлены рекомендации по переименованию для корректной работы телепрограммы.');
     }
 }

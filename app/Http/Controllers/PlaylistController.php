@@ -6,6 +6,7 @@ use App\Channel;
 use App\ChannelGroup;
 use App\Config;
 use App\DBChannel;
+use App\Helpers\Log;
 use App\Playlist;
 use Illuminate\Http\Request;
 
@@ -17,12 +18,14 @@ class PlaylistController extends Controller
      */
     public static function syncWithPlaylist()
     {
-        if (Config::get('builderMode')){
+        if (Config::get('builderMode')) {
             return redirect()->back()
                 ->with('info', 'Для данной операции необходимо убрать галочку "создать плейлист в нуля" в настроках');
         }
         self::updateGroupsFromPlaylist();
         self::updateChannelsFromPlaylist();
+
+        Log::log('Каналы и группы синхронизированы с текущим плейлистом (' . Config::get('inputPlaylist') . ')');
 
         return redirect()->back()
             ->with('status', 'Список групп и каналов успешно обновлен из плейлиста');
@@ -122,6 +125,8 @@ class PlaylistController extends Controller
             if (!in_array($group->id, $groupsIdWithOwnChannels))
                 ChannelGroup::destroy($group->id);
         }
+        Log::log('Все каналы и группы, кроме пользовательских, удалены');
+
         return redirect()->route('channels')->with('status', 'Плейлист успешно очищен');
     }
 

@@ -12,7 +12,16 @@
         <div class="content-box-large box-with-header" id="output-tvprogram-path-field">
             <h5>{{ $outputTVProgramPath }}</h5>
         </div>
+
+        <div class="content-box-header">
+            <div class="panel-title">Лента событий</div>
+        </div>
+        <div class="content-box-large box-with-header" id="logs">
+
+        </div>
+
     </div>
+
     <div class="col-md-8">
         <div class="content-box-header">
             <div class="panel-title">Данные о текущей телепрограмме</div>

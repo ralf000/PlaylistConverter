@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DBChannel;
 use App\ChannelGroup;
+use App\Helpers\Log;
 use Illuminate\Http\Request;
 
 class ChannelsController extends Controller
@@ -55,6 +56,16 @@ class ChannelsController extends Controller
         $channel->sort = ++$maxSortValue;
         $channel->own = 1;
         if ($channel->save()) {
+            $groupName = ChannelGroup::select('original_name')
+                ->where('id', $channel->group_id)
+                ->first()
+                ->original_name;
+            Log::log(
+                "Добавлен новый канал (название: «{$channel->original_name}», 
+                группа: «{$groupName}», 
+                'url: «{$channel->original_url}»')"
+            );
+
             return redirect()->route('channels')->with('status', 'Новый канал успешно добавлен');
         }
 
@@ -105,6 +116,8 @@ class ChannelsController extends Controller
         }
         $this->checkNonameGroup();
 
+        Log::log('Данные каналов и групп обновлены');
+
         return redirect()->route('channels')->with('status', 'Изменения успешно сохранены');
     }
 
@@ -125,6 +138,9 @@ class ChannelsController extends Controller
                 $channelGroupController->destroyNonameGroup();
 
             DBChannel::destroy($channel->id);
+
+            Log::log("Канал «{$channel->new_name}» успешно удалён");
+
             return redirect()->route('channels')->with('status', 'Канал успешно удален');
         }
         throw new \Exception("Не удалось удалить канал с идентификатором {$request->id}");
@@ -140,7 +156,13 @@ class ChannelsController extends Controller
         $id = $request->id;
         if (!$id) throw new \Exception('Не указан id канала');
         $channel = DBChannel::find((int)$id);
-        $channel->hidden = ($channel->hidden === 0) ? 1 : 0;
+        if ($channel->hidden === 0) {
+            $channel->hidden = 1;
+            Log::log("Канал «{$channel->new_name}» стал видимым");
+        } else {
+            Log::log("Канал «{$channel->new_name}» скрыт");
+            $channel->hidden = 0;
+        }
         return $channel->save();
     }
 

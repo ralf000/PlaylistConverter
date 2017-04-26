@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Config;
+use App\Helpers\Log;
 use App\Playlist;
 use App\TVProgram;
 use Illuminate\Http\Request;
@@ -55,6 +56,9 @@ class ConfigController extends Controller
             $configRow = Config::where('name', $name);
             $configRow->update(['name' => $name, 'value' => $value]);
         }
+        
+        Log::log('Данные конфигурации изменены');
+        
         return redirect()->route('config')->with('status', 'Настройки успешно обновлены');
     }
 

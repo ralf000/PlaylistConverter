@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ChannelGroup;
 use App\DBChannel;
+use App\Helpers\Log;
 use Illuminate\Http\Request;
 
 class ChannelGroupController extends Controller
@@ -41,6 +42,8 @@ class ChannelGroupController extends Controller
         $group->sort = ++$maxSortValue;
         $group->own = 1;
         if ($group->save()) {
+            Log::log("Добавлеа новая группа: «{$group->original_name}»");
+
             return redirect()->route('channels')->with('status', 'Новая группа успешно добавлена');
         }
 
@@ -49,7 +52,7 @@ class ChannelGroupController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * 
+     *
      * @param Request $request
      * @return $this
      */
@@ -98,6 +101,10 @@ class ChannelGroupController extends Controller
                 $this->destroyNonameGroup();
 
             ChannelGroup::destroy($group->id);
+
+            Log::log("Группа «{$group->new_name}» успешно удалена. 
+            Все каналы данной группы были перемещены в группу «" . self::NONAMEGROUP . '»');
+
             return redirect()->route('channels')->with('status', 'Группа успешно удалена');
         }
         throw new \Exception("Не удалось удалить группу с идентификатором {$request->id}");
@@ -113,7 +120,13 @@ class ChannelGroupController extends Controller
         $id = $request->id;
         if (!$id) throw new \Exception('Не указан id группы');
         $group = ChannelGroup::find((int)$id);
-        $group->hidden = ($group->hidden === 0) ? 1 : 0;
+        if ($group->hidden === 0) {
+            $group->hidden = 1;
+            Log::log("Группа «{$group->new_name}» стала видимымой");
+        } else {
+            Log::log("Группа «{$group->new_name}» скрыта");
+            $group->hidden = 0;
+        }
         return $group->save();
     }
 
@@ -133,6 +146,8 @@ class ChannelGroupController extends Controller
         foreach ($channelsFromGroup as $channelFromGroup) {
             $channelFromGroup->group_id = $nonameGroupId;
             $channelFromGroup->save();
+
+            Log::log('Группа канала «' . $channelFromGroup->new_name . '» изменена на «' . self::NONAMEGROUP . '»');
         }
     }
 
@@ -179,10 +194,12 @@ class ChannelGroupController extends Controller
         $group = new ChannelGroup();
         $group->original_name = self::NONAMEGROUP;
         $group->new_name = self::NONAMEGROUP;
-        if ($group->save())
+        if ($group->save()) {
+            Log::log('Группа «' . self::NONAMEGROUP . '» успешно создана');
             return $group->id;
-        else
+        } else {
             throw new \Exception('Не удалось создать группу ' . self::NONAMEGROUP);
+        }
     }
 
     /**
@@ -193,8 +210,10 @@ class ChannelGroupController extends Controller
     public function destroyNonameGroup() : int
     {
         $groupId = $this->getNonameGroupId();
-        if ($groupId !== false)
+        if ($groupId !== false) {
+            Log::log('Группа «' . self::NONAMEGROUP . '» успешно удалена');
             return ChannelGroup::destroy($groupId);
+        }
         return false;
     }
 

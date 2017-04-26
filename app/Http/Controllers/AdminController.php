@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Config;
+use App\Helpers\Log;
 use App\TVProgram;
 use Illuminate\Http\Request;
 
