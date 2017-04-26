@@ -711,3 +711,7 @@ a.accordion-title {
 button.change-channel-visibility-btn {
     min-width: 90px;
 }
+
+.gray{
+    color: #9a9a9a;
+}

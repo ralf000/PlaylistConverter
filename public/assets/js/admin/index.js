@@ -15,6 +15,7 @@ function getNotFoundChannels(params) {
             targetBlock.append('<div>' + data['channels'] + '</div>');
         })
         .error(function () {
+            targetBlock.empty();
             var msg = 'Не удалось проверить телепрограмму. Проверьте доступность файла телепрограммы.';
             targetBlock.append(msg)
         });

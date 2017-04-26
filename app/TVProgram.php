@@ -63,6 +63,57 @@ class TVProgram extends AFile implements ICreating
     public function check()
     {
         $this->create();
+        $withoutProgram = $this->getWithoutProgramChannelsList();
+        return $this->showChannelsWithoutProgram($withoutProgram);
+    }
+
+    /**
+     * Получает список каналов без телепрограммы
+     * Составляет рекомендации по переименованию данных каналов
+     *
+     * @return array
+     */
+    private function getWithoutProgramChannelsList() : array
+    {
+        $xmlChannels = $this->getXmlChannelsList();
+        $playlistChannels = (new Playlist())->getHandledChannels();
+        $withoutProgram = [];
+        $foundChannel = '';
+        foreach ($playlistChannels as $playlistChannel) {
+            /**
+             * @var Channel $playlistChannel
+             */
+            $playlistChannelTitle = $playlistChannel->getTitle();
+            if (!in_array($playlistChannelTitle, $xmlChannels)) {
+                if (in_array(mb_strtolower($playlistChannelTitle), array_map('mb_strtolower', $xmlChannels))) {
+                    foreach ($xmlChannels as $xmlChannel) {
+                        if (mb_strtolower($xmlChannel) == mb_strtolower($playlistChannelTitle))
+                            $foundChannel = $xmlChannel;
+                    }
+                } else {
+                    foreach ($xmlChannels as $xmlChannel) {
+                        $foundChannel = $this->reduceSearch(
+                            $xmlChannel,
+                            $playlistChannelTitle,
+                            mb_strlen($playlistChannelTitle)
+                        );
+                        if ($foundChannel) break;
+                    }
+                }
+                $withoutProgram[] = ['originalTitle' => $playlistChannelTitle, 'recommendedTitle' => $foundChannel];
+            }
+        }
+        $this->delete($this->outputTVPath);
+        return $withoutProgram;
+    }
+
+    /**
+     * Получает список каналов из телепрограммы
+     *
+     * @return array
+     */
+    private function getXmlChannelsList() : array
+    {
         $xml = $this->getSimpleXml();
         if (!$xml)
             throw new FileException('Не удалось открыть файл ' . $this->outputTVPath);
@@ -71,20 +122,27 @@ class TVProgram extends AFile implements ICreating
             /**
              * @var \SimpleXMLElement $item
              */
-            $xmlChannels[] = MbString::mb_trim((string)$item->{'display-name'});
+            $foundXmlChannel = MbString::mb_trim((string)$item->{'display-name'});
+            if ($foundXmlChannel)
+                $xmlChannels[] = $foundXmlChannel;
         }
-        $playlistChannels = (new Playlist())->getHandledChannels();
-        $withoutProgram = [];
-        foreach ($playlistChannels as $playlistChannel) {
-            /**
-             * @var Channel $playlistChannel
-             */
-            $playlistChannelTitle = $playlistChannel->getTitle();
-            if (!in_array($playlistChannelTitle, $xmlChannels))
-                $withoutProgram[] = $playlistChannelTitle;
-        }
-        $this->delete($this->outputTVPath);
-        return $this->showChannelsWithoutProgram($withoutProgram);
+        return $xmlChannels;
+    }
+
+    /**
+     * Ищет совпадения отнимая по одному символу
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @param int $needleOriginLength
+     * @return string|bool
+     */
+    private function reduceSearch(string $haystack, string $needle, int $needleOriginLength) : string
+    {
+        if ($needleOriginLength < 5 || mb_strlen($needle) < 5) return false;
+        if (mb_stripos($haystack, $needle) !== false)
+            return $haystack;
+        return $this->reduceSearch($haystack, mb_substr($needle, 0, -1), $needleOriginLength);
     }
 
     /**
@@ -143,18 +201,23 @@ class TVProgram extends AFile implements ICreating
             $output = '<p><strong>Телепрограмма доступна для всех телеканалов текущего плейлиста</strong></p>';
         } else {
             $output = '<p><strong>Телепрограмма не найдена для следующих телеканалов:</strong></p>';
-            $output .= '<div class="row"><ul>';
+            $output .= '<div class="row">';
             $channels = [];
             foreach ($withoutProgram as $channel) {
-                $channels[] = '<li>' . htmlspecialchars($channel) . '</li>';
+                $channels[] = "<tr>\n<td>" . htmlspecialchars($channel['originalTitle']) . "</td>\n"
+                    . '<td class="gray">' . htmlspecialchars($channel['recommendedTitle']) . "</td>\n</tr>\n";
             }
             if (count($channels) > 10) {
                 $chunks = array_chunk($channels, ceil(count($channels) / 3));
                 foreach ($chunks as $chunk) {
-                    $output .= '<div class="col-md-4">' . implode("\n\t", $chunk) . '</div>';
+                    $output .= '<div class="col-md-4">'
+                        . "\n<table class='table table-bordered table-striped'>\n"
+                        . "<tr>\n<th>Название</th>\n<th>Рекомендуемое название</th>\n</tr>\n"
+                        . implode("\n\t", $chunk)
+                        . "\n</table>\n</div>";
                 }
             }
-            $output .= '</ul></div>';
+            $output .= "\n</div>\n";
         }
         return $output;
     }
