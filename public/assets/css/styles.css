@@ -715,3 +715,7 @@ button.change-channel-visibility-btn {
 .gray{
     color: #9a9a9a;
 }
+
+#not-found-channels .col-md-4 {
+    padding: 0;
+}

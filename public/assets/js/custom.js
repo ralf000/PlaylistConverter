@@ -2,6 +2,18 @@
 var sortedGroupsList = $(".sortable-groups");
 var sortedChannelsList = $(".sortable-channels");
 
+//HtmlSpecialChars equivalent in Javascript
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
 
 function addHandlersCustom() {
     addUpdateFromPlaylistHandler();

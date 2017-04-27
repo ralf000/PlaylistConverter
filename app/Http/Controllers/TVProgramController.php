@@ -25,9 +25,10 @@ class TVProgramController extends Controller
             $channels = $tvProgram->check();
             $date = date('d-m-Y H:i:s');
             $tvProgramData = ['date' => $date, 'channels' => $channels];
+            
             \Cache::forever('channelsWithoutTVProgram', $tvProgramData);
+            Log::log('Все телеканалы просканированы на наличие телепрограммы (' . \Cache::get('currentTVProgram') . ')');
         }
-        Log::log('Все телеканалы просканированы на наличие телепрограммы (' . \Cache::get('currentTVProgram') . ')');
 
         return $tvProgramData;
     }
