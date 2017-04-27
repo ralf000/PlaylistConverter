@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ChannelGroup;
 use App\DBChannel;
+use App\Helpers\ArrayHelper;
 use App\Helpers\Log;
 use Illuminate\Http\Request;
 
@@ -42,7 +43,7 @@ class ChannelGroupController extends Controller
         $group->sort = ++$maxSortValue;
         $group->own = 1;
         if ($group->save()) {
-            Log::log("Добавлеа новая группа: «{$group->original_name}»");
+            Log::log("Добавлена новая группа: «{$group->original_name}»");
 
             return redirect()->route('channels')->with('status', 'Новая группа успешно добавлена');
         }
@@ -62,6 +63,11 @@ class ChannelGroupController extends Controller
 
         foreach ($input as $groupData) {
 
+            $group = ChannelGroup::find($groupData['id']);
+            
+            if (!ArrayHelper::hasDiff($group->toArray(), $groupData))
+                continue;
+
             $validationRules = [
                 'id' => 'required|integer',
                 'original_name' => "required",
@@ -78,10 +84,12 @@ class ChannelGroupController extends Controller
             if ($validator->fails()) {
                 return redirect()->route('channels')->withErrors($validator);
             }
-            $group = ChannelGroup::find($groupData['id']);
             $group->fill($groupData);
             $group->update();
         }
+
+        if ($this->emptyNonameGroup())
+            $this->destroyNonameGroup();
     }
 
     /**
@@ -142,9 +150,11 @@ class ChannelGroupController extends Controller
         if (!count($channelsFromGroup))
             return;
 
+
         $nonameGroupId = $this->addNonameGroup();
         foreach ($channelsFromGroup as $channelFromGroup) {
             $channelFromGroup->group_id = $nonameGroupId;
+            $channelFromGroup->original_group_id = $nonameGroupId;
             $channelFromGroup->save();
 
             Log::log('Группа канала «' . $channelFromGroup->new_name . '» изменена на «' . self::NONAMEGROUP . '»');
@@ -156,10 +166,13 @@ class ChannelGroupController extends Controller
      *
      * @return bool
      */
-    public function emptyNonameGroup() : bool
+    public function emptyNonameGroup($deletedChannelId = false) : bool
     {
         $nonameGroupId = $this->getNonameGroupId();
-        $nonameGroupChannels = DBChannel::all()->where('group_id', $nonameGroupId);
+        /*$channels = DBChannel::where('group_id', $nonameGroupId)->get();
+        if (count($channels) === 1 && (int)$channels[0]->id === (int)$deletedChannelId)
+            return true;*/
+        $nonameGroupChannels = DBChannel::where('group_id', $nonameGroupId)->get();
         return count($nonameGroupChannels) === 0;
     }
 
@@ -171,9 +184,9 @@ class ChannelGroupController extends Controller
     private function hasNonameGroup() : bool
     {
         $groupId = $this->getNonameGroupId();
-        if ($groupId === false) return false;
+        if ($groupId == false) return false;
 
-        $channels = DBChannel::where('group_id', $groupId);
+        $channels = DBChannel::where('group_id', $groupId)->get();
         if (count($channels)) return false;
 
         return true;
@@ -224,7 +237,7 @@ class ChannelGroupController extends Controller
     private function getNonameGroupId() : int
     {
         $group = ChannelGroup::where('original_name', self::NONAMEGROUP)->first();
-        if (count($group))
+        if ($group)
             return $group->id;
         else
             return false;

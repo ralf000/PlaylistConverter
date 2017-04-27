@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DBChannel;
 use App\ChannelGroup;
+use App\Helpers\ArrayHelper;
 use App\Helpers\Log;
 use Illuminate\Http\Request;
 
@@ -83,6 +84,11 @@ class ChannelsController extends Controller
 
         foreach ($input as $id => $channelData) {
 
+            $channel = DBChannel::find($channelData['id']);
+
+            if (!ArrayHelper::hasDiff($channel->toArray(), $channelData))
+                continue;
+
             $validationRules = [
                 'id' => 'required|integer',
                 'sort' => 'required|integer',
@@ -99,18 +105,10 @@ class ChannelsController extends Controller
             if ($validator->fails()) {
                 return redirect()->route('channels')->withErrors($validator);
             }
-            $channel = DBChannel::find($channelData['id']);
 
-            if ($channel->original_name !== $channelData['original_name']
-                || $channel->original_url !== $channelData['original_url']
-                || (int)$channel->original_group_id !== (int)$channelData['original_group_id']
-            ) {
-                throw new \Exception('Переданы неверные данные для канала ' . $channel->new_name);
-            }
             $channel->fill($channelData);
             $channel->update();
         }
-        $this->checkNonameGroup();
 
         Log::log('Данные каналов и групп обновлены');
 
@@ -129,11 +127,9 @@ class ChannelsController extends Controller
         //если канал добавлен пользователем (own === 1) и передан верный id
         if ($channel && $channel->own) {
 
-            $channelGroupController = new ChannelGroupController();
-            if ($channelGroupController->emptyNonameGroup())
-                $channelGroupController->destroyNonameGroup();
-
             DBChannel::destroy($channel->id);
+
+            $this->checkNonameGroup();
 
             Log::log("Канал «{$channel->new_name}» успешно удалён");
 
