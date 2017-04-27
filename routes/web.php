@@ -126,6 +126,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
             'as' => 'get-not-found-channels'
         ]);
 
+        Route::get('/get-logs', function (){
+            return (new \App\Helpers\Log())->getLogs();
+        })->name('get-logs');
+
     });
 
 });

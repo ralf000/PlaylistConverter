@@ -25,7 +25,7 @@ class PlaylistController extends Controller
         self::updateGroupsFromPlaylist();
         self::updateChannelsFromPlaylist();
 
-        Log::log('Каналы и группы синхронизированы с текущим плейлистом (' . Config::get('inputPlaylist') . ')');
+        Log::log('Каналы и группы синхронизированы с текущим плейлистом');
 
         return redirect()->back()
             ->with('status', 'Список групп и каналов успешно обновлен из плейлиста');

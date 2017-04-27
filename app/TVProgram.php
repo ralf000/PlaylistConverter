@@ -261,8 +261,6 @@ class TVProgram extends AFile implements ICreating
             if ($withoutProgramChannel['recommendedTitle'])
                 $numChannelsWithRecommendationsNum++;
         }
-        Log::log('Телепрограмма успешно проверена. 
-        Для ' . count($withoutProgramChannels) . ' каналов не найдено телепрограммы. 
-        Для ' . $numChannelsWithRecommendationsNum . 'каналов подготовлены рекомендации по переименованию для корректной работы телепрограммы.');
+        Log::log('Телепрограмма успешно проверена. Для ' . count($withoutProgramChannels) . ' каналов не найдено телепрограммы. Для ' . $numChannelsWithRecommendationsNum . ' каналов подготовлены рекомендации по переименованию для корректной работы телепрограммы.');
     }
 }

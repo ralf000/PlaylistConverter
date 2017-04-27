@@ -211,7 +211,6 @@ class ChannelGroupController extends Controller
     {
         $groupId = $this->getNonameGroupId();
         if ($groupId !== false) {
-            Log::log('Группа «' . self::NONAMEGROUP . '» успешно удалена');
             return ChannelGroup::destroy($groupId);
         }
         return false;

@@ -60,11 +60,7 @@ class ChannelsController extends Controller
                 ->where('id', $channel->group_id)
                 ->first()
                 ->original_name;
-            Log::log(
-                "Добавлен новый канал (название: «{$channel->original_name}», 
-                группа: «{$groupName}», 
-                'url: «{$channel->original_url}»')"
-            );
+            Log::log("Добавлен новый канал (название: «{$channel->original_name}», группа: «{$groupName}», url: «{$channel->original_url}»)");
 
             return redirect()->route('channels')->with('status', 'Новый канал успешно добавлен');
         }
