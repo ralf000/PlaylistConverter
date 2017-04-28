@@ -34,8 +34,6 @@ class ChannelsController extends Controller
      */
     public function store(Request $request)
     {
-        //масимальное значение поля sort для сортировки новых добавляемых каналов
-        $maxSortValue = DBChannel::all('sort')->max('sort');
 
         $input = $request->except(['_token', '_method']);
 
@@ -49,8 +47,19 @@ class ChannelsController extends Controller
             return redirect()->route('channels')->withErrors($validator);
         }
 
+        if ($this->saveChannel($input) !== false)
+            return redirect()->route('channels')->with('status', 'Новый канал успешно добавлен');
+
+        throw new \Exception('При добавлении нового канала что-то пошло не так');
+    }
+
+    public function saveChannel(array $data)
+    {
+        //масимальное значение поля sort для сортировки новых добавляемых каналов
+        $maxSortValue = DBChannel::all('sort')->max('sort');
+
         $channel = new DBChannel();
-        $channel->fill($input);
+        $channel->fill($data);
         $channel->new_name = $channel->original_name;
         $channel->new_url = $channel->original_url;
         $channel->group_id = $channel->original_group_id;
@@ -62,11 +71,9 @@ class ChannelsController extends Controller
                 ->first()
                 ->original_name;
             Log::log("Добавлен новый канал (название: «{$channel->original_name}», группа: «{$groupName}», url: «{$channel->original_url}»)");
-
-            return redirect()->route('channels')->with('status', 'Новый канал успешно добавлен');
+            return $channel->id;
         }
-
-        throw new \Exception('При добавлении нового канала что-то пошло не так');
+        return false;
     }
 
     /**

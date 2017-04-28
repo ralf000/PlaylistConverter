@@ -30,6 +30,7 @@
 {{--modals--}}
 @include('admin.include.add-channel-modal')
 @include('admin.include.add-group-modal')
+@include('admin.include.add-playlist-modal')
 {{--/modals--}}
 <script src="{{ asset('/assets/js/admin/groups.js') }}"></script>
 <script src="{{ asset('/assets/js/admin/channels.js') }}"></script>

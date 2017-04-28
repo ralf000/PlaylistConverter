@@ -16,4 +16,17 @@ class ChannelGroup extends Model
     {
         return $this->hasMany(DBChannel::class, 'group_id');
     }
+
+    /**
+     * Проверяет наличие группы в бд
+     *
+     * @param string $name
+     * @return int|bool
+     */
+    public static function exists(string $name) : int
+    {
+        $group = self::where('new_name', $name)->first();
+        return !empty($group) ? $group->id : false;
+    }
+
 }

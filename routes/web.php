@@ -26,6 +26,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
     ]);
 
     /**
+     * Сохранить пользовательский плейлист
+     */
+    Route::put('/', [
+        'uses' => 'PlaylistController@store',
+        'as' => 'playlist-store'
+    ]);
+
+    /**
      * Синхронизировать с плейлистом
      */
     Route::post('/update-from-playlist', function () {

@@ -7,11 +7,67 @@ use App\ChannelGroup;
 use App\Config;
 use App\DBChannel;
 use App\Helpers\Log;
+use App\Helpers\MbString;
 use App\Playlist;
 use Illuminate\Http\Request;
 
 class PlaylistController extends Controller
 {
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     * @throws \Exception
+     */
+    public function store(Request $request)
+    {
+        //масимальное значение поля sort для сортировки новых добавляемых каналов
+        $maxSortValue = DBChannel::all('sort')->max('sort');
+
+        $input = $request->except(['_token', '_method']);
+
+        $rules = ['playlist' => 'required'];
+        if ((int)$input['original_group_id'] !== -1)
+            $rules += ['original_group_id' => 'required|integer|exists:channel_groups,id'];
+        else
+            $rules += ['original_group_id' => 'required'];
+
+        $validator = \Validator::make($input, $rules);
+        if ($validator->fails()) {
+            return redirect()->route('channels')->withErrors($validator);
+        }
+
+        $tmpFile = $this->createAndWriteTmpFileForPlaylist($input['playlist']);
+        $playlist = new Playlist();
+        $playlist->setDescriptor($tmpFile);
+        $channels = $playlist->getRawChannels();
+        if (!$channels || !is_array($channels))
+            throw new \Exception('При добавлении каналов из плейлиста что-то пошло не так');
+
+        foreach ($channels as $channel) {
+            /**
+             * @var Channel $channel
+             */
+            if (!$channel->getTitle() || !$channel->getUrl())
+                continue;
+
+            if ((int)$input['original_group_id'] === -1) {
+                $groupId = (new ChannelGroupController())->getGroupIdForInputChannel($channel);
+            } else {
+                $groupId = $input['original_group_id'];
+            }
+
+            $channelData = [
+                'original_name' => $channel->getTitle(),
+                'original_url' => $channel->getUrl(),
+                'original_group_id' => $groupId
+            ];
+            (new ChannelsController())->saveChannel($channelData);
+        }
+
+        return redirect()->route('channels')->with('status', 'Новые каналы из плейлиста успешно добавлены');
+    }
 
     /**
      * Проверяет добавлены ли каналы и группы из плейлиста, указанного в настройках
@@ -53,8 +109,8 @@ class PlaylistController extends Controller
 
             $channelGroup = new ChannelGroup();
             $channelGroup->fill([
-                'original_name' => $groupFromPlaylist,
-                'new_name' => $groupFromPlaylist,
+                'original_name' => MbString::mb_trim($groupFromPlaylist),
+                'new_name' => MbString::mb_trim($groupFromPlaylist),
                 'sort' => ++$maxSortValue
             ]);
             $channelGroup->save();
@@ -130,4 +186,15 @@ class PlaylistController extends Controller
         return redirect()->route('channels')->with('status', 'Плейлист успешно очищен');
     }
 
+    /**
+     * @param string $data
+     * @return resource
+     */
+    private function createAndWriteTmpFileForPlaylist(string $data)
+    {
+        $tmpFile = tmpfile();
+        fwrite($tmpFile, $data);
+        fseek($tmpFile, 0);
+        return $tmpFile;
+    }
 }

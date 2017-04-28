@@ -43,7 +43,9 @@
                     title="Сбросить изменения">
                 <span class="glyphicon glyphicon-share-alt"></span>
             </button>
-            @if ($group['own'] || in_array($group['new_name'], $emptyGroups))
+            @if ($group['own']
+            || in_array($group['new_name'], $emptyGroups)
+            || $group['original_name'] === \App\Http\Controllers\ChannelGroupController::NONAMEGROUP)
                 <button data-id="{{$group['id']}}"
                         data-name="{{$group['new_name']}}"
                         class="group-delete-btn btn btn-default"

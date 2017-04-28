@@ -719,3 +719,8 @@ button.change-channel-visibility-btn {
 #not-found-channels .col-md-4 {
     padding: 0;
 }
+
+.code-block{
+    border: 1px solid #ddd;
+    padding: 5px;
+}

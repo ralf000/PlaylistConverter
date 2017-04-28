@@ -3,17 +3,20 @@
         Сохранить
     </button>
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-channel">
-        Добавить канал
+        <span class="glyphicon glyphicon-plus"></span> Канал
     </button>
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#add-group">
-        Добавить группу
+        <span class="glyphicon glyphicon-plus"></span> Группа
+    </button>
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add-playlist">
+        <span class="glyphicon glyphicon-plus"></span> Плейлист
     </button>
         <button type="button" class="btn btn-default pull-right" id="reset-playlist">
-            Сбросить все данные из плейлиста
+            <span class="glyphicon glyphicon-remove"></span> Сбросить все данные из плейлиста
         </button>
     @if (!\App\Config::get('builderMode'))
         <button type="button" class="btn btn-default pull-right" id="update-from-playlist">
-            Синхронизировать с плейлистом
+            <span class="glyphicon glyphicon-refresh"></span> Синхронизировать с плейлистом
         </button>
     @endif
 </div>

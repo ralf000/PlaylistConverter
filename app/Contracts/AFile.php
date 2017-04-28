@@ -51,4 +51,14 @@ abstract class AFile
     {
         return unlink($path) ? true : false;
     }
+
+    /**
+     * @param resource $descriptor
+     */
+    public function setDescriptor($descriptor)
+    {
+        $this->descriptor = $descriptor;
+    }
+    
+    
 }

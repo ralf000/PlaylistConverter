@@ -112,7 +112,7 @@ class Playlist extends AFile implements ICreating
     /**
      * Парсит телеканалы из плейлиста
      */
-    private function setChannelsFromPlaylist()
+    public function setChannelsFromPlaylist()
     {
         $skipNextTitle = false; //пропустить следующую строку
         $channel = new Channel(); //инициализация канала
@@ -177,7 +177,7 @@ class Playlist extends AFile implements ICreating
             fwrite($descriptor, $channel->convert());
         }
         $this->sendReport();
-        
+
         $this->close($descriptor);
     }
 

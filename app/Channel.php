@@ -67,7 +67,7 @@ class Channel
         if ($isrPos = mb_strpos($title, 'ISR:') !== false)
             $title = MbString::mb_trim(substr($title, mb_strlen('ISR:')));
         if (preg_match('~group-title="(.*)"~Uui', $EXTINF, $groupString)) {
-            $this->group = $groupString[1];
+            $this->group = MbString::mb_trim($groupString[1]);
         }
         $this->title = $title;
     }
@@ -103,7 +103,7 @@ class Channel
      */
     public function setTitle($title)
     {
-        $this->title = $title;
+        $this->title = MbString::mb_trim($title);
     }
 
     /**
@@ -111,7 +111,7 @@ class Channel
      */
     public function setGroup($group)
     {
-        $this->group = $group;
+        $this->group = MbString::mb_trim($group);
     }
 
     /**
@@ -124,7 +124,7 @@ class Channel
      */
     public function setUrl(string $url) : string
     {
-        return $this->url = $url;
+        return $this->url = MbString::mb_trim($url);
     }
 
     /**
@@ -140,7 +140,7 @@ class Channel
      */
     public function getTitle()
     {
-        return $this->title;
+        return MbString::mb_trim($this->title);
     }
 
     /**
@@ -148,7 +148,7 @@ class Channel
      */
     public function getGroup()
     {
-        return $this->group;
+        return MbString::mb_trim($this->group);
     }
 
     /**
@@ -156,7 +156,7 @@ class Channel
      */
     public function getUrl()
     {
-        return $this->url;
+        return MbString::mb_trim($this->url);
     }
 
     /**
