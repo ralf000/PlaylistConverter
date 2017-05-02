@@ -9,7 +9,7 @@ use Monolog\Handler\StreamHandler;
 class Log extends AFile
 {
     const LOG_NAME = 'info';
-    const LOGS_NUM = 30;
+    const LOGS_NUM = 20;
 
     /**
      * Log constructor.
@@ -39,14 +39,21 @@ class Log extends AFile
     public function getLogs()
     {
         $logsCounter = 0;
-        $logs = [];
-        while ($logsCounter < self::LOGS_NUM && !feof($this->descriptor)) {
+        $logs = array_reverse(file($this->path));
+        $output = [];
+        foreach ($logs as $index => $log) {
+            $output[] = $this->logHandler($log);
+            if ($index === self::LOGS_NUM - 1)
+                break;
+        }
+        return $output;
+        /*while ($logsCounter < self::LOGS_NUM && !feof($this->descriptor)) {
             $line = fgets($this->descriptor);
             if (!$line) continue;
             $logs[] = $this->logHandler($line);
             $logsCounter++;
         }
-        return array_reverse($logs);
+        return array_reverse($logs);*/
     }
 
     /**

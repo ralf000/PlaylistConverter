@@ -19,9 +19,7 @@
                 <button class="btn btn-xs btn-default" id="update-logs"><i class="glyphicon glyphicon-refresh"></i> Обновить</button>
             </div>
         </div>
-        <div class="content-box-large box-with-header" id="logs">
-
-        </div>
+        <div class="content-box-large box-with-header" id="logs"></div>
 
     </div>
 
@@ -32,9 +30,7 @@
                 <button class="btn btn-xs btn-default" id="refresh-not-found-channels"><i class="glyphicon glyphicon-refresh"></i> Обновить</button>
             </div>
         </div>
-        <div class="content-box-large box-with-header" id="not-found-channels">
-
-        </div>
+        <div class="content-box-large box-with-header" id="not-found-channels"></div>
     </div>
 </div>
 

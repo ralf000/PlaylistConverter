@@ -21,6 +21,6 @@ class AdminController extends Controller
         $outputPlaylistPath = url('/') . '/' . Config::get('outputPlaylistName');
         $outputTVProgramPath = url('/') . '/' . Config::get('outputTVProgramName') . '.gz';
 
-        return view('admin.index', compact('title', 'outputPlaylistPath', 'outputTVProgramPath', 'tvProgramData'));
+        return view('admin.index', compact('title', 'outputPlaylistPath', 'outputTVProgramPath'));
     }
 }

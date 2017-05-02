@@ -70,7 +70,7 @@ class ChannelsController extends Controller
                 ->where('id', $channel->group_id)
                 ->first()
                 ->original_name;
-            Log::log("Добавлен новый канал (название: «{$channel->original_name}», группа: «{$groupName}», url: «{$channel->original_url}»)");
+            Log::log("Добавлен новый канал (название: «{$channel->original_name}», группа: «{$groupName}»");
             return $channel->id;
         }
         return false;
@@ -140,7 +140,8 @@ class ChannelsController extends Controller
 
             Log::log("Канал «{$channel->new_name}» успешно удалён");
 
-            return redirect()->route('channels')->with('status', 'Канал успешно удален');
+            return true;
+            //return redirect()->route('channels')->with('status', 'Канал успешно удален');
         }
         throw new \Exception("Не удалось удалить канал с идентификатором {$request->id}");
     }

@@ -222,8 +222,7 @@ class Playlist extends AFile implements ICreating
 
     private function sendReport()
     {
-        Log::log("Новый плейлист успешно создан. Всего каналов: {$this->channelsInfo['raw']}. 
-        После обработки: {$this->channelsInfo['handled']}. Пользовательских каналов: {$this->channelsInfo['own']}");
+        Log::log("Новый плейлист успешно создан. Всего каналов: {$this->channelsInfo['raw']}. После обработки: {$this->channelsInfo['handled']}. Пользовательских каналов: {$this->channelsInfo['own']}");
     }
 
     /**

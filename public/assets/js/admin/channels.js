@@ -15,6 +15,22 @@ function sendChangeChannelVisibilityAjax(el) {
     });
 }
 
+function sendDeleteChannelAjax(el) {
+    $.ajax({
+        method: 'delete',
+        url: '/admin/ajax/channel-delete',
+        data: {
+            "_token": el.data('token'),
+            id: el.data('id')
+        }
+    }).done(function (data) {
+        if (data.error === 0) {
+            alert(data.error);
+        } else {
+        }
+    });
+}
+
 /**
  * Обработтчик для удаления каналов
  */
@@ -24,10 +40,12 @@ function addDeleteChannelHandler() {
         e.preventDefault();
         var id = $(this).data('id');
         var name = $(this).data('name');
-        var form = $('form#channel-delete');
-        form.find('input[name=id]').attr('value', id);
-        if (confirm('Вы действительно хотите удалить канал ' + '"' + name + '"?'))
-            form.submit();
+        // var form = $('form#channel-delete');
+        //form.find('input[name=id]').attr('value', id);
+        if (confirm('Вы действительно хотите удалить канал ' + '"' + name + '"?')) {
+            sendDeleteChannelAjax($(this));
+            $(this).closest('tr').fadeOut();
+        }
     });
 }
 
@@ -46,8 +64,9 @@ function addResetChannelHandler() {
             group = $(group);
             if (group.attr('selected'))
                 group.removeAttr('selected');
-            if (group.attr('value') == originalGroupId)
-                group.attr('selected', 'selected');
+            if (group.attr('value') == originalGroupId) {
+                group.prop('selected', true);
+            }
         });
     });
 }

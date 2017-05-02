@@ -13,7 +13,7 @@
 Auth::routes();
 
 Route::get('/', function () {
-    return \App\Http\Controllers\IndexController::run();
+    \App\Http\Controllers\IndexController::run();
 })->middleware('auth.basic');
 
 
@@ -106,10 +106,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
             'as' => 'channels-update'
         ]);
 
-        Route::delete('/', [
+        /*Route::delete('/', [
             'uses' => 'ChannelsController@destroy',
             'as' => 'channel-delete'
-        ]);
+        ]);*/
 
     });
 
@@ -127,6 +127,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'init']], function (
         Route::post('/change-channel-visibility', [
             'uses' => 'ChannelsController@changeChannelVisibility',
             'as' => 'change-channel-visibility'
+        ]);
+
+        Route::delete('/channel-delete', [
+            'uses' => 'ChannelsController@destroy',
+            'as' => 'channel-delete'
         ]);
         
         Route::get('/get-not-found-channels', [

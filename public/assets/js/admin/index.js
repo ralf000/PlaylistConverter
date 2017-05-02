@@ -37,7 +37,7 @@ function getLogs() {
             $.each(data, function (id, log) {
                 logs[id] = '<tr><td>' + log.date + '</td><td>' + escapeHtml(log.message) + '</td></tr>';
             });
-            var table = '<table class="table"><tr><th style="width: 80px;">Дата</th><th>Сообщение</th></tr>'+logs.join('\n')+'</table>';
+            var table = '<table class="table"><tr><th style="width: 100px;">Дата</th><th>Сообщение</th></tr>'+logs.join('\n')+'</table>';
             targetBlock.append(table);
         })
         .error(function () {

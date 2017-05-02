@@ -23,13 +23,13 @@
                id="{{$channel['id']}}"
                placeholder="{{$channel['new_name']}}"
                value="{{$channel['new_name']}}"
-                {{($channel['hidden'] !== 0) ? 'disabled="disabled"' : ''}}>
+                {{($channel['hidden'] !== 0) ? 'readonly="readonly"' : ''}}>
     </td>
     <td {!! ($channel['hidden'] !== 0) ? 'style="opacity: 0.4;"' : ''!!}>
         <select name="channel[{{$channel['id']}}][group_id]"
                 id="group"
                 class="form-control group-id"
-                {{($channel['hidden'] !== 0) ? 'disabled="disabled"' : ''}}>
+                {{($channel['hidden'] !== 0) ? 'readonly="readonly"' : ''}}>
             @foreach($groups as $groupForSelect)
                 <option value="{{$groupForSelect['id']}}"
                         {{ ($channel['group_id'] === $groupForSelect['id']) ? 'selected' : '' }}>
@@ -42,7 +42,7 @@
         <input name="channel[{{$channel['id']}}][new_url]"
                type="url" class="form-control new-url"
                id="new_url"
-               value="{{$channel['new_url']}}" {{($channel['hidden'] !== 0) ? 'disabled="disabled"' : ''}}>
+               value="{{$channel['new_url']}}" {{($channel['hidden'] !== 0) ? 'readonly="readonly"' : ''}}>
     </td>
 
     <td>
@@ -72,6 +72,7 @@
         @if ($channel['own'])
             <button data-id="{{$channel['id']}}"
                     data-name="{{$channel['new_name']}}"
+                    data-token="{{ csrf_token() }}"
                     class="channel-delete-btn btn btn-default"
                     title="Удалить канал"
                     type="button"><span class="glyphicon glyphicon-remove"></span></button>
