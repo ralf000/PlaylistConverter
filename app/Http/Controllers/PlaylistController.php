@@ -228,14 +228,14 @@ class PlaylistController extends Controller
     ) : bool
     {
         $title = mb_strtolower($channelFromPlaylist->getTitle());
-        $url = mb_strtolower($channelFromPlaylist->getUrl());
+        $url = $channelFromPlaylist->getUrl();
         $group = mb_strtolower($channelFromPlaylist->getGroup());
 
         if (!in_array($group, $preparedGroupsFromDB)) return false;
 
         if (!in_array($title, $preparedAddedChannelsTitles)) return true;
 
-        if ($url !== $preparedAddedChannelsUrls[$title]['original_url']) {
+        if (mb_strtolower($url) !== $preparedAddedChannelsUrls[$title]['original_url']) {
             $channelForUpdate = DBChannel::where('original_name', $title)->first();
             if ($channelForUpdate) {
                 $channelData = ['original_url' => $url];
