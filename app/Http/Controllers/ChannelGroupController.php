@@ -143,7 +143,7 @@ class ChannelGroupController extends Controller
         $group = ChannelGroup::find((int)$id);
         if ($group->hidden === 0) {
             $group->hidden = 1;
-            Log::log("Группа «{$group->new_name}» стала видимымой");
+            Log::log("Группа «{$group->new_name}» стала видимой");
         } else {
             Log::log("Группа «{$group->new_name}» скрыта");
             $group->hidden = 0;
