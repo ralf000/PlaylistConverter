@@ -34,7 +34,6 @@ class ChannelsController extends Controller
      */
     public function store(Request $request)
     {
-
         $input = $request->except(['_token', '_method']);
 
         $validator = \Validator::make($input, [

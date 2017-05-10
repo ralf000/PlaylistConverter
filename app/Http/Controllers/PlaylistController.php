@@ -76,7 +76,7 @@ class PlaylistController extends Controller
     {
         if (Config::get('builderMode')) {
             return redirect()->back()
-                ->with('info', 'Для данной операции необходимо убрать галочку "создать плейлист в нуля" в настроках');
+                ->with('info', 'Для данной операции необходимо убрать галочку "создать плейлист в нуля" в настройках');
         }
         self::updateGroupsFromPlaylist();
         self::updateChannelsFromPlaylist();
@@ -119,6 +119,7 @@ class PlaylistController extends Controller
 
     /**
      * Получает все каналы из плейлиста и сохраняет те, которые отсутствуют в бд
+     * Меняет url каналов при необходимости
      *
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -134,20 +135,31 @@ class PlaylistController extends Controller
         foreach ($groupsFromDB as $groupFromDB) {
             $preparedGroupsFromDB[$groupFromDB['id']] = mb_strtolower($groupFromDB['original_name']);
         }
-        $addedChannels = DBChannel::all(['new_name'])->toArray();
-        $preparedAddedChannels = [];
+        $addedChannels = DBChannel::all(['original_name', 'original_url', 'new_url'])->toArray();
+        //подготовка массива с заголовками каналов из бд
+        $preparedAddedChannelsTitles = [];
         foreach ($addedChannels as $addedChannel) {
-            $preparedAddedChannels[] = mb_strtolower($addedChannel['new_name']);
+            $preparedAddedChannelsTitles[] = mb_strtolower($addedChannel['original_name']);
+        }
+        //подготовка массива с url каналов из бд
+        $preparedAddedChannelsUrls = [];
+        foreach ($addedChannels as $addedChannel) {
+            $preparedAddedChannelsUrls[mb_strtolower($addedChannel['original_name'])] = [
+                'original_url' => mb_strtolower($addedChannel['original_url']),
+                'new_url' => mb_strtolower($addedChannel['new_url'])
+            ];
         }
         foreach ($channelsFromPlaylist as $channelFromPlaylist) {
-            /**
-             * @var Channel $channelFromPlaylist
-             */
-            $group = mb_strtolower($channelFromPlaylist->getGroup());
-            $title = mb_strtolower($channelFromPlaylist->getTitle());
-            if (in_array($title, $preparedAddedChannels)) continue;
-            if (!in_array($group, $preparedGroupsFromDB)) continue;
 
+            if (!self::needUpdateChannelFromPlaylist(
+                $channelFromPlaylist,
+                $preparedGroupsFromDB,
+                $preparedAddedChannelsTitles,
+                $preparedAddedChannelsUrls
+            )
+            ) continue;
+
+            $group = mb_strtolower($channelFromPlaylist->getGroup());
             $channel = new DBChannel();
             $channel->fill([
                 'original_name' => $channelFromPlaylist->getTitle(),
@@ -196,5 +208,44 @@ class PlaylistController extends Controller
         fwrite($tmpFile, $data);
         fseek($tmpFile, 0);
         return $tmpFile;
+    }
+
+    /**
+     * Проверяет нужно ли добавить текущий канал из плейлиста в бд
+     * Также Обновляет url канала в бд при необходимости
+     *
+     * @param Channel $channelFromPlaylist
+     * @param array $preparedGroupsFromDB
+     * @param array $preparedAddedChannelsTitles
+     * @param array $preparedAddedChannelsUrls
+     * @return bool
+     */
+    private static function needUpdateChannelFromPlaylist(
+        Channel $channelFromPlaylist,
+        array $preparedGroupsFromDB,
+        array $preparedAddedChannelsTitles,
+        array $preparedAddedChannelsUrls
+    ) : bool
+    {
+        $title = mb_strtolower($channelFromPlaylist->getTitle());
+        $url = mb_strtolower($channelFromPlaylist->getUrl());
+        $group = mb_strtolower($channelFromPlaylist->getGroup());
+
+        if (!in_array($group, $preparedGroupsFromDB)) return false;
+
+        if (!in_array($title, $preparedAddedChannelsTitles)) return true;
+
+        if ($url !== $preparedAddedChannelsUrls[$title]['original_url']) {
+            $channelForUpdate = DBChannel::where('original_name', $title)->first();
+            if ($channelForUpdate) {
+                $channelData = ['original_url' => $url];
+                if ($channelForUpdate->original_url === $channelForUpdate->new_url) {
+                    $channelData += ['new_url' => $url];
+                }
+                $channelForUpdate->fill($channelData);
+                $channelForUpdate->update();
+            }
+        }
+        return false;
     }
 }
